@@ -1,0 +1,12 @@
+{
+  "LICENSE": "747b45fb70bbc46628a8a6b642f3c1283899f54b16f83398b527d96492d364ae",
+  "README.md": "e7fa45e23bd580f22389e2868478485b279117a50142f8762085694311f54ce9",
+  "SKILL.md": "160a80c97ca99f8683a1f374aa43252a66f9c1fa148a5c2f3d7171ef988a8666",
+  "agents/openai.yaml": "7893916feac3d59054ec7ae02243c0d37e098ae7435f770c431882221f17b3e4",
+  "references/capabilities.md": "521032d67bcdb621268b1d3fde2030c455f835efdb6aff944a8711d986a249ea",
+  "references/examples.md": "a912c071d4328a3e236aecbbef500b777876dc74c8c575cf2538c796148ae3c3",
+  "references/host.md": "b066777d3d78a6ffb3836b3b5dff18ffcac974e3c9f43fbf4e6d9a79186fa729",
+  "references/runtime.md": "a6a5180dfcdf9a68a109e97caa84da69a5878fbd85c6919f23d2dab2edefbe9f",
+  "scripts/install.py": "442e1007768a7d602f3f293f0064e4fa768f87cd18eecb29fe7bd36b9a5ccd45",
+  "templates/handoff.md": "be07cff096b17ce6cdcbc719d4d753754ec7a4c3e5f024275aefe6736c939856"
+}

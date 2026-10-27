@@ -1,0 +1,62 @@
+{
+  "native_contexts": [
+    {
+      "label": "unrelated-1",
+      "skill_scope": "user",
+      "skill_enabled": true,
+      "skill_errors": [],
+      "global_instruction_loaded": true
+    },
+    {
+      "label": "unrelated-2",
+      "skill_scope": "user",
+      "skill_enabled": true,
+      "skill_errors": [],
+      "global_instruction_loaded": true
+    }
+  ],
+  "implicit_invocation": {
+    "observed": true,
+    "tools": 3,
+    "evidence": "Raw command events show read of installed model-switcher SKILL.md without a user skill tag. Global AGENTS policy and metadata coexist; no description-only causality claim."
+  },
+  "trivial_exclusion": {
+    "tools": 0,
+    "response": "the sky is blue"
+  },
+  "fresh_context": {
+    "checkpoint_verify": "passed",
+    "owner_retained": true,
+    "implementation": "withheld",
+    "issues_observed": [
+      "repository-changed",
+      "job-needs-live-verification"
+    ],
+    "scope": "read-only audit; full lease-transfer implementation not executed"
+  },
+  "raw_evidence": "Kept privately with build; not in distributable archive",
+  "release_011_profile_checks": {
+    "release": "0.1.1",
+    "global_profiles": [
+      {
+        "profile_label": "primary",
+        "unrelated_contexts": 2,
+        "skill_scope": "user",
+        "skill_enabled": true,
+        "global_instruction_loaded": true,
+        "skill_errors": 0
+      },
+      {
+        "profile_label": "secondary",
+        "unrelated_contexts": 2,
+        "skill_scope": "user",
+        "skill_enabled": true,
+        "global_instruction_loaded": true,
+        "skill_errors": 0
+      }
+    ],
+    "native_method": "skills/list forceReload and new ephemeral thread/start instructionSources",
+    "model_turns_started": 0,
+    "guarantee": "Observed local loading; no guarantee of every future invocation or override precedence"
+  }
+}

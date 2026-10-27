@@ -1,0 +1,142 @@
+[
+  {
+    "path": "SKILL.md",
+    "source_sha256": "792b65d1fb7f047af30d9690924ab14f98fc8bef568a1ad80e22ce7045a0c902",
+    "matches_installed": true
+  },
+  {
+    "path": "assets/checkpoint.schema.json",
+    "source_sha256": "f9634687acc2eb814ead2ba39c874ebedf6a3dab7dc9e23a5f3bc50bbe606e09",
+    "matches_installed": true
+  },
+  {
+    "path": "assets/planned-task-template.json",
+    "source_sha256": "1cbf101af90cca037f2c3ed3938fc78d986fb03a17e41832142936a506b47b09",
+    "matches_installed": true
+  },
+  {
+    "path": "assets/routed-task-template.json",
+    "source_sha256": "40a23c7f004f754611cd2e785260222fcddbeecc38e4da5d7b4ada17e661b0d6",
+    "matches_installed": true
+  },
+  {
+    "path": "assets/router-config.example.json",
+    "source_sha256": "50c1c43c970d837539d672eb57c16e4d8247f436ed11ea1954d4c5d982fa12c5",
+    "matches_installed": true
+  },
+  {
+    "path": "assets/task-template.json",
+    "source_sha256": "3354f6369a9bafb693b753e460001993eb9a149026a8f04bb09d1a23f3013275",
+    "matches_installed": true
+  },
+  {
+    "path": "assets/task.schema.json",
+    "source_sha256": "be4a08ad35d5378f0c71d7855ed4a04afdbd69a0f84d797c371e8337b1565180",
+    "matches_installed": true
+  },
+  {
+    "path": "references/account.md",
+    "source_sha256": "3f828e520c12a9117280d5de5d5f6f375eded35c663c66d189a6faf0d4db88ef",
+    "matches_installed": false
+  },
+  {
+    "path": "references/automation-v04.md",
+    "source_sha256": "3ca29b7ae2caf029ebcb905825f68d75026318dbb6809b97b24bd2e9b9dd77c7",
+    "matches_installed": true
+  },
+  {
+    "path": "references/automation.md",
+    "source_sha256": "f0329ff08ae44be22f138351b2d7f56fb8e72a7815dfda997ab250d9056e95b2",
+    "matches_installed": true
+  },
+  {
+    "path": "references/hosts.md",
+    "source_sha256": "bcaf143b1eac837d62391075cbac59cd8ce1571c298539bcdd3905e3ff4cb96a",
+    "matches_installed": true
+  },
+  {
+    "path": "references/operator.md",
+    "source_sha256": "de73d11ce003a1804a5967533c35a196fc8d771369a63e21ada7599f7f15d8ce",
+    "matches_installed": true
+  },
+  {
+    "path": "references/profiles-local.md",
+    "source_sha256": "73751e0d79997f97ff13f234be0369eb73187204b6d539b3d915957537833458",
+    "matches_installed": true
+  },
+  {
+    "path": "references/router.md",
+    "source_sha256": "cd47c0ea3412f3740b65bb3ffe5c97523fcf1d77107596f1f4b16d4114ead559",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/account.py",
+    "source_sha256": "f3d5167f7af7244c382594c806eceb70eed4734cd2d5407d2173ba95c218b275",
+    "matches_installed": false
+  },
+  {
+    "path": "scripts/checkpoint.py",
+    "source_sha256": "03f2d32e58efca8286f433c4e1cd1ae5f3649ad04d1c8cb68d9b828070ae3b6c",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/codex_probe.py",
+    "source_sha256": "e63bd8e13e98241620d6363baa9dd32307a93f90b2dc4a40c096a55731466e02",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/fixture_worker.py",
+    "source_sha256": "186e11b20d1b989b203716266b4ba72d394d734acd11de65b3a4e79997ac930e",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/hook.py",
+    "source_sha256": "d4c9d5848341d0af21a592be7522afb03257b42e83a41f2f8adb7e2333742133",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/local_text.py",
+    "source_sha256": "dc8b39358c4b19ad52e45b1beffd7fb29cedf7b738279785e66e0e6ca4c88de2",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/local_text_worker.py",
+    "source_sha256": "6b32cf8f669b66a3bd5169928c02eedfe489c0a79f2e87ab2bd2d85f76c8d38c",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/monitor.py",
+    "source_sha256": "93646bdc6f9b5491e4de00725b1a465c3370728bc95f8a1622efb83e81c26268",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/planner.py",
+    "source_sha256": "d47fdf2868cf571e268282f1b58d39faa26b45254a36d8b58407f9aaa881a522",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/profiles.py",
+    "source_sha256": "1a1631544247658ce7b50fc635e8e736a78f3cfb76d89d413069549e1a7012d7",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/router.py",
+    "source_sha256": "505864ade8fa1104d27864223d6bc85b03bebe36e7402f466d8362b853a18c12",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/router_policy.py",
+    "source_sha256": "f0a3f43d07bca5322778c5ed2bc957066729b49f1b0284eec999731feeb3155e",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/telemetry.py",
+    "source_sha256": "e2d89bc12d3481ad7f2de06bebc806485504d6963fe5e623eaca5ffe2e992088",
+    "matches_installed": true
+  },
+  {
+    "path": "scripts/transfer.py",
+    "source_sha256": "b9ac21bca3f526c2aae460b65a0e47fcb6d28d08732b7cb46b20416d30fd0cfd",
+    "matches_installed": true
+  }
+]

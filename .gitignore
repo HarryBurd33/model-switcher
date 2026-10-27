@@ -1,0 +1,7 @@
+.checkpoint/
+.forge/
+__pycache__/
+*.pyc
+dist/
+validation/discovery.json
+validation/fresh-handoff.json

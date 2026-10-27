@@ -1,0 +1,12 @@
+{
+  "frozen_cases_sha256": "850de5f972e41fddfbee82c92e41f1d7fdfefef5de6c0185ff5a8deab16374f0",
+  "method": "Independent evaluator matches actual response to frozen expected action and critical forbidden results; binary pass/fail/partial, no averaging critical failures",
+  "live_comparison": "Fixed Sol medium direct prompt versus Luna medium full companion instructions; synthetic routing decisions, not production coding or broad quality proof",
+  "budgets": {
+    "max_model_turns": 6,
+    "per_turn_seconds": 180,
+    "api_usd": 0
+  },
+  "cases": "cases.json",
+  "baseline_prompt": "Complete work to a high standard while conserving separate subscription and API resources. Use suitable models, preserve acceptance checks, respect authorization and give concise decisions. Stay on the selected evaluation model; do not route or delegate this evaluation itself."
+}

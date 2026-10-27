@@ -1,0 +1,84 @@
+{
+  "rows": [
+    {
+      "name": "baseline-suite",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "seconds": 23.565,
+      "tools": 0,
+      "input_tokens": 17286,
+      "cached_input_tokens": 13184,
+      "output_tokens": 905,
+      "total_tokens": 18191,
+      "api_usd": null,
+      "attributable_subscription_usage": null
+    },
+    {
+      "name": "candidate-suite",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "seconds": 14.556,
+      "tools": 0,
+      "input_tokens": 25231,
+      "cached_input_tokens": 12544,
+      "output_tokens": 1194,
+      "total_tokens": 26425,
+      "api_usd": null,
+      "attributable_subscription_usage": null
+    },
+    {
+      "name": "implicit-substantial",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "seconds": 22.242,
+      "tools": 3,
+      "input_tokens": 72992,
+      "cached_input_tokens": 51328,
+      "output_tokens": 602,
+      "total_tokens": 73594,
+      "api_usd": null,
+      "attributable_subscription_usage": null
+    },
+    {
+      "name": "trivial-exclusion",
+      "model": "gpt-6.1-sol",
+      "effort": "low",
+      "seconds": 4.395,
+      "tools": 0,
+      "input_tokens": 21707,
+      "cached_input_tokens": 13184,
+      "output_tokens": 8,
+      "total_tokens": 21715,
+      "api_usd": null,
+      "attributable_subscription_usage": null
+    },
+    {
+      "name": "fresh-handoff",
+      "model": "gpt-6.1-sol",
+      "effort": "medium",
+      "seconds": 53.236,
+      "tools": 13,
+      "input_tokens": 337684,
+      "cached_input_tokens": 277248,
+      "output_tokens": 2611,
+      "total_tokens": 340295,
+      "api_usd": null,
+      "attributable_subscription_usage": null
+    },
+    {
+      "name": "candidate-v2-suite",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "seconds": 12.124,
+      "tools": 0,
+      "input_tokens": 25259,
+      "cached_input_tokens": 12544,
+      "output_tokens": 1212,
+      "total_tokens": 26471,
+      "api_usd": null,
+      "attributable_subscription_usage": null
+    }
+  ],
+  "six_turn_seconds_sum": 130.118,
+  "limitation": "Only these evaluation threads; excludes parent, helpers, setup, independent grading and packaging. Not total workflow cost or measured savings."
+}

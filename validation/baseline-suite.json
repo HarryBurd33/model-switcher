@@ -1,0 +1,28 @@
+{
+  "name": "baseline-suite",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "seconds_including_tools": 23.565,
+  "response": "{\n  \"complex\": {\n    \"action\": \"Plan phased work with acceptance checks.\",\n    \"assignment\": \"gpt-6-astra high for ingestion design; gpt-6.1-sol medium for the bounded parser after design acceptance.\",\n    \"reasoning\": \"Resolve event identity, deduplication and retry semantics first; verify parser bounds and failure handling.\",\n    \"required_user_action\": \"None for this hypothetical assignment.\"\n  },\n  \"typo\": {\n    \"action\": \"Keep the correction local and verify the diff.\",\n    \"assignment\": \"Selected model.\",\n    \"reasoning\": \"A single typo does not justify switching overhead.\",\n    \"required_user_action\": \"None.\"\n  },\n  \"optout\": {\n    \"action\": \"Continue without routing or delegation.\",\n    \"assignment\": \"Selected model.\",\n    \"reasoning\": \"The explicit model preference controls.\",\n    \"required_user_action\": \"None.\"\n  },\n  \"overhead\": {\n    \"action\": \"Complete on the current model.\",\n    \"assignment\": \"Selected model.\",\n    \"reasoning\": \"Twenty seconds of switching exceeds the five-second task.\",\n    \"required_user_action\": \"None.\"\n  },\n  \"escalation\": {\n    \"action\": \"Reassess the identity assumption before retrying implementation.\",\n    \"assignment\": \"gpt-6-astra high.\",\n    \"reasoning\": \"The failure changes the design premise; preserve existing acceptance checks and add coverage for the corrected identity semantics.\",\n    \"required_user_action\": \"None unless the identity contract requires clarification.\"\n  },\n  \"manual\": {\n    \"action\": \"Recommend a suitable model without claiming a desktop switch.\",\n    \"assignment\": \"Selected model pending manual selection; sol medium for general work or astra high for complex reasoning.\",\n    \"reasoning\": \"Catalog availability does not provide authority or capability to mutate the active model.\",\n    \"required_user_action\": \"Manually select the recommended model if a switch is desired.\"\n  },\n  \"stale\": {\n    \"action\": \"Treat subscription capacity and API balance as separately unknown.\",\n    \"assignment\": \"Selected model; no paid API assignment.\",\n    \"reasoning\": \"Yesterday's 70 percent is stale and establishes no current capacity or API funds.\",\n    \"required_user_action\": \"Provide fresh subscription usage if capacity affects continuation; separately authorize any API spending.\"\n  },\n  \"zero\": {\n    \"action\": \"Checkpoint and pause resource-consuming work.\",\n    \"assignment\": \"None.\",\n    \"reasoning\": \"Fresh remaining capacity is below the reserve, and the zero-dollar API cap excludes paid fallback.\",\n    \"required_user_action\": \"Wait for subscription capacity to replenish or explicitly revise the resource constraints.\"\n  },\n  \"unavailable\": {\n    \"action\": \"Revalidate availability and select a qualified available replacement.\",\n    \"assignment\": \"gpt-6.1-sol medium for general work; gpt-6-astra high for complex reasoning, subject to availability.\",\n    \"reasoning\": \"Do not dispatch to the vanished worker; luna qualifies only for public text transformations.\",\n    \"required_user_action\": \"None unless replacement requires a manual model switch.\"\n  },\n  \"uncertain\": {\n    \"action\": \"Reconcile ownership and descendant status before redispatch.\",\n    \"assignment\": \"No new worker until exclusive ownership is established.\",\n    \"reasoning\": \"An interruption does not prove descendants stopped; a second dispatcher could duplicate work or spending.\",\n    \"required_user_action\": \"None unless ownership cannot be established without user input.\"\n  },\n  \"recovery\": {\n    \"action\": \"Validate checkpoint state, current authorization and unresolved-job status before resuming.\",\n    \"assignment\": \"No replacement worker until ownership and prior execution are reconciled.\",\n    \"reasoning\": \"A checkpoint preserves task data, not permissions or proof that an unresolved job has stopped; retain its acceptance checks.\",\n    \"required_user_action\": \"Supply any missing authorization or information required after reconciliation.\"\n  }\n}",
+  "tool_count": 0,
+  "token_usage": {
+    "total": {
+      "totalTokens": 18191,
+      "inputTokens": 17286,
+      "cachedInputTokens": 13184,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 905,
+      "reasoningOutputTokens": 81
+    },
+    "last": {
+      "totalTokens": 18191,
+      "inputTokens": 17286,
+      "cachedInputTokens": 13184,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 905,
+      "reasoningOutputTokens": 81
+    },
+    "modelContextWindow": 475000
+  },
+  "status": "completed"
+}

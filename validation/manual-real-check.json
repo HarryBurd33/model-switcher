@@ -1,0 +1,50 @@
+{
+  "case": "manual-real-checkpoint",
+  "historical_case": "manual",
+  "status": "pass",
+  "criterion_source": "Unchanged manual case expectation plus eight supplemental concrete checks frozen before execution",
+  "input_summary": "Fresh read-only model context, real immutable 0.1.0 release checkpoint, current live model catalog, no active-desktop mutation interface, publisher lease retained",
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "observed_checks": {
+    "actual_checkpoint_verify": true,
+    "actual_artifact_checks": true,
+    "exact_available_model_effort": true,
+    "exact_existing_checkpoint_path": true,
+    "explicit_manual_user_action": true,
+    "filled_copyable_resume": true,
+    "current_authority_and_ownership_before_write": true,
+    "no_desktop_switch_or_lease_mutation": true
+  },
+  "independent_grade": "manual-real-review.md",
+  "seconds_including_tools": 58.886,
+  "tool_calls": 9,
+  "reported_token_usage": {
+    "total": {
+      "totalTokens": 264129,
+      "inputTokens": 260965,
+      "cachedInputTokens": 229504,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 3164,
+      "reasoningOutputTokens": 93
+    },
+    "last": {
+      "totalTokens": 46846,
+      "inputTokens": 45731,
+      "cachedInputTokens": 45184,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 1115,
+      "reasoningOutputTokens": 0
+    },
+    "modelContextWindow": 475000
+  },
+  "private_response_sha256": "fd98c2e32097f01d0dfc4a49c9ef9681a3db63d7b49dc1f3121dff4938d518b3",
+  "private_event_log_sha256": "d9c30427ba4b78bfa2be8649eae91ef6a923e30850fe1843ae3a8fa81543b6ec",
+  "privacy": "Actual user paths, checkpoint content, account state and transcript withheld; reviewer checked private originals locally",
+  "limits": [
+    "Historical synthetic manual output remains partial",
+    "Evidence is for immutable 0.1.0 baseline artifacts, not new 0.1.1 ZIP bytes",
+    "No picker action, desktop switch, lease transfer or receiving implementation executed",
+    "No cost or general quality guarantee"
+  ]
+}

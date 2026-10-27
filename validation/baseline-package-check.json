@@ -1,0 +1,10 @@
+{
+  "artifact": "model-switcher-0.1.0.zip",
+  "files": 24,
+  "bytes": 45404,
+  "sha256": "a89e104db0290e7005f4354b743b9c91c70d62ba99a73f25f6e11257bb070eb2",
+  "deterministic_repeat": true,
+  "exported_installer_tests": 9,
+  "exported_static_validation": "pass",
+  "source_install_match": true
+}
