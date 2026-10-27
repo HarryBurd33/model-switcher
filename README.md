@@ -9,13 +9,16 @@ separate resources, and counts handoff, validation, review, retries and repair a
 - Requests the strongest suitable available model for consequential planning, then
   considers qualified cheaper workers or lower reasoning effort for bounded work.
 - Keeps acceptance criteria, privacy, explicit model choices and stop policies intact.
+- Automatically selects this active chat’s model/effort for subsequent turns when the
+  native app interface is present and this chat’s user has authorized it.
 - Produces a verified manual handoff when an automatic route is unavailable.
 - Installs a user-wide skill and global instructions requesting its use for substantial
   work. Trivial corrections stay lightweight.
 
-This is an instruction policy with a tested installer. It **does not automatically change
-the active desktop chat's model**, guarantee invocation in every chat, or guarantee lower
-cost. Global instructions are interpreted by Codex; project overrides, opt-outs, alternate
+This is an instruction policy with tested setup and a guarded native selection route.
+It can update the same active chat’s selected model/effort for subsequent turns. It does
+not switch an inference already running, guarantee automatic next-turn execution,
+invocation in every chat, or lower cost. Global instructions are interpreted by Codex; project overrides, opt-outs, alternate
 profiles and host capabilities still apply. A selected-model CLI worker is a separate
 operation. [Capabilities and evidence](model-switcher/references/capabilities.md).
 
@@ -45,7 +48,17 @@ $model-switcher Implement this feature and verify the supplied acceptance tests.
 ```
 
 You can also say “Use Model Switcher for this task.” To opt out: “Stay on my selected
-model and do not route or delegate this task.” When a manual transition is useful, follow
+model and do not route or delegate this task.” To authorize native automatic selection once for the current chat/task, say:
+
+```text
+$model-switcher Automatically select models and reasoning effort in this chat.
+```
+
+The native route uses a user-visible configuration cue and verifies host readback.
+It requires the Codex app messaging tool plus the CLI for readback; CLI-only and
+unverified hosts retain manual fallback. [Native procedure](model-switcher/references/active-chat.md).
+
+When a manual transition is useful, follow
 the packet's exact model/effort, picker steps and resume instruction.
 
 If you use another local Codex profile, keep one shared skill install and activate that
@@ -71,7 +84,8 @@ fresh authority/resources before continuing. See both variants in the
 uses task-checkpoint 0.5.0, its existing identity/store/lease/router, and independently
 qualified model/effort/tools/privacy assignments. That runtime is not bundled and is not
 currently supplied as a public dependency by this repository. Public installation alone
-therefore provides the policy and manual mode, not automatic worker execution. A host
+provides policy/manual mode and the conditional native selection route, not automatic
+worker execution. A host
 with that compatible runtime can follow the [runtime procedure](model-switcher/references/runtime.md).
 No paid API fallback is enabled; API execution needs a separate authorized provider and
 explicit spending boundary. Unknown telemetry and unmeasured savings remain unknown.
@@ -80,7 +94,7 @@ explicit spending boundary. Unknown telemetry and unmeasured savings remain unkn
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 scripts/build_release.py --output dist/model-switcher-0.1.1.zip
+python3 scripts/build_release.py --output dist/model-switcher-0.2.0.zip
 ```
 
 The build validates metadata, relative links, MIT notices and the explicit public file

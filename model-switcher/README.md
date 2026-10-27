@@ -1,4 +1,4 @@
-# Model Switcher 0.1.1
+# Model Switcher 0.2.0
 
 A user-level Codex policy for strong planning, economical qualified work and verified
 completion. Subscription allowance and API spending are separate resources. This is a
@@ -53,7 +53,10 @@ available model, then considers qualified cheaper assignments or lower reasoning
 It preserves user choices and skips expensive orchestration for trivial work. See
 [examples](references/examples.md), [runtime mapping](references/runtime.md) and
 [manual switching](references/host.md). A selected CLI worker is separate from the active
-desktop conversation. This package cannot automatically switch that desktop chat.
+desktop conversation. The [native route](references/active-chat.md) can automatically select this same chat’s
+model/effort for subsequent turns when explicitly authorized and supported. It does not
+change already-running inference or guarantee an automatic next turn. Manual fallback
+remains when the native tool/readback is unavailable.
 
 ## Update, rollback, uninstall
 

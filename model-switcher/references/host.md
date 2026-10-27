@@ -13,11 +13,13 @@ reported by a trusted thread surface is stronger evidence than a config default.
 such surface is exposed, effective desktop model/effort remain unknown.
 
 App-server `turn/start` supports model/effort for threads owned by that server. That is
-not evidence of control over an unrelated live desktop chat. This package implements
-no active-desktop switching interface. Do not guess thread IDs or call another session
-to change this one. Default config edits do not retroactively change the active chat.
+not evidence of control over an unrelated live desktop chat. The native app messaging
+tool is a separate verified surface: model/effort overrides can set this same chat's
+selection for subsequent turns. Use the [guarded native procedure](active-chat.md).
+Do not guess thread IDs or call another session to change this one. This does not prove
+mid-turn inference switching. Default edits do not retroactively change the active chat.
 
-Manual desktop transition:
+When the native route or verification is unavailable, use manual desktop transition:
 
 1. Choose an exact model and effort from the current catalog/picker and record why.
 2. Save/verify the complete task-checkpoint bundle, jobs and artifacts; release the lease

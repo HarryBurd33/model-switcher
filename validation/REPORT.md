@@ -1,3 +1,44 @@
+# Model Switcher validation — 0.2.0
+
+## Native same-chat model selection
+
+The supported Codex app messaging tool accepted two self-targeted model/effort overrides
+in the actual active chat. Read-only app-server metadata for that exact identity first
+reported **gpt-6-luna / medium**, then **gpt-6.1-sol / medium** after the second request.
+The matching identity and differing states provide observed selection-change evidence,
+without picker automation, default edits, another worker or a new conversation.
+
+The original turn remained in progress and configuration cues arrived as steering input.
+This establishes configured/latest-persisted **selection for subsequent turns**, not a
+changed model executing the current inference, a new turn or automatic continuation.
+The schema itself labels thread model/effort as configuration rather than per-turn
+telemetry. Separate readback connections reported notLoaded/latest-persisted state.
+Computer use denied access to Codex; that route was not bypassed. A shared-daemon proxy
+read probe timed out and is not the implemented mutation or verification route.
+
+The new standard-library helper plans guarded native arguments and performs read-only
+inspection/verification. It never calls messaging or starts/resumes inference itself.
+Thirteen new deterministic tests cover wrong chat/host, missing authority, stale/future
+observations, low/unknown resources, unavailable/ambiguous model or effort, pending
+duplicates, unchanged selection, prompt-safe IDs, readback mismatches, no execution
+claims, a read-only protocol and process cleanup. The original 16 installer/profile and
+two package tests remain regressions. Real helper inspect/plan/verify was also exercised
+on this current chat with fresh catalog and resource observations, without another cue.
+
+See active-chat-check.json and active-chat-review.md for sanitized evidence and independent
+review. Native cues require current human authority for this same chat, durable intent
+and the existing task lease, live catalog/resource checks and exact host readback.
+Context booleans are operator attestations, not authentication or restored permissions.
+The helper alone does not fence concurrent writers. Unknown or ambiguous outcomes block
+reposting until reconciled. No paid API route, worker, hidden IPC or new service was used.
+
+Other hosts without the native tool/readback keep manual fallback. No production-quality,
+savings, universal activation, mid-turn inference or automatic-follow-up execution claim
+follows from this configuration test. Private chat IDs, messages and current task state
+are excluded from exports. Historical results below retain their original scope.
+
+---
+
 # Model Switcher validation — 0.1.1
 
 The missing ready-handoff capability check is **resolved by an executed real-checkpoint

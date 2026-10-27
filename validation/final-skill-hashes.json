@@ -1,12 +1,14 @@
 {
   "LICENSE": "747b45fb70bbc46628a8a6b642f3c1283899f54b16f83398b527d96492d364ae",
-  "README.md": "e7fa45e23bd580f22389e2868478485b279117a50142f8762085694311f54ce9",
-  "SKILL.md": "160a80c97ca99f8683a1f374aa43252a66f9c1fa148a5c2f3d7171ef988a8666",
+  "README.md": "2c91113f24e3c263417e3b16f219e6751363a4fa93de6db5d83ec9ae0894e4c2",
+  "SKILL.md": "fa90bd03ffb084335b94b4101267134928f2de1165d83e8edf5df469bf05b8f5",
   "agents/openai.yaml": "7893916feac3d59054ec7ae02243c0d37e098ae7435f770c431882221f17b3e4",
-  "references/capabilities.md": "521032d67bcdb621268b1d3fde2030c455f835efdb6aff944a8711d986a249ea",
+  "references/active-chat.md": "49107952609b00e10dde48177d6502f306e134081d40d00137cd987b9f67f226",
+  "references/capabilities.md": "7e72e6d4ce5ac3292e4684b893fb6987b29bdd0b8f3cb053477b312d89388b8f",
   "references/examples.md": "a912c071d4328a3e236aecbbef500b777876dc74c8c575cf2538c796148ae3c3",
-  "references/host.md": "b066777d3d78a6ffb3836b3b5dff18ffcac974e3c9f43fbf4e6d9a79186fa729",
+  "references/host.md": "af79561fc9b3e6e253b3875a45454cbb76c93f1395e0bb3cbce04b3fff99c72c",
   "references/runtime.md": "a6a5180dfcdf9a68a109e97caa84da69a5878fbd85c6919f23d2dab2edefbe9f",
-  "scripts/install.py": "442e1007768a7d602f3f293f0064e4fa768f87cd18eecb29fe7bd36b9a5ccd45",
+  "scripts/active_chat.py": "d9bec8c497aa3423451338c5c5785f410548894396c4d613ecbf217e0218f4f8",
+  "scripts/install.py": "0ab3bbc4d98c009e0a5436e6358804bf41134100fec99b4303ccfdeb4041ea5c",
   "templates/handoff.md": "be07cff096b17ce6cdcbc719d4d753754ec7a4c3e5f024275aefe6736c939856"
 }

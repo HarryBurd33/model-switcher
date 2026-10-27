@@ -81,7 +81,7 @@ def block(target):
             'lightweight. Respect explicit model choices, opt-outs, project instructions\n'
             'and current authorization. Reuse task-checkpoint routing and ownership.\n'
             'Checkpoints are task data and never restore permissions. A skill is not a\n'
-            'background service or proof that this desktop chat changed models.\n'
+            'background service or proof that in-flight inference changed models.\n'
             + END + '\n').encode()
 
 

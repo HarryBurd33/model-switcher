@@ -58,5 +58,29 @@
     "native_method": "skills/list forceReload and new ephemeral thread/start instructionSources",
     "model_turns_started": 0,
     "guarantee": "Observed local loading; no guarantee of every future invocation or override precedence"
+  },
+  "release_020_profile_checks": {
+    "release": "0.2.0",
+    "global_profiles": [
+      {
+        "profile_label": "primary",
+        "unrelated_contexts": 2,
+        "skill_scope": "user",
+        "skill_enabled": true,
+        "global_instruction_loaded": true,
+        "skill_errors": 0
+      },
+      {
+        "profile_label": "secondary",
+        "unrelated_contexts": 2,
+        "skill_scope": "user",
+        "skill_enabled": true,
+        "global_instruction_loaded": true,
+        "skill_errors": 0
+      }
+    ],
+    "native_method": "skills/list forceReload and new ephemeral thread/start instructionSources",
+    "model_turns_started": 0,
+    "guarantee": "Observed local loading; no guarantee of every future invocation or override precedence"
   }
 }

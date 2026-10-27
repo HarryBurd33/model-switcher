@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "case": "native-active-chat-selection",
+  "status": "observed-selection-pass",
+  "native_interface": "mcp__codex_app__send_message_to_thread model/thinking",
+  "same_chat_identity_verified": true,
+  "first_observed_selection": {
+    "model": "gpt-6-luna",
+    "effort": "medium"
+  },
+  "second_observed_selection": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium"
+  },
+  "native_requests": 2,
+  "new_turn_observed": false,
+  "existing_turn_observed": "same original turn still in progress; configuration cues appeared as steering/function output",
+  "metadata_scope": "latest_persisted on separate read-only app-server connections",
+  "helper_protocol": "initialize, initialized, thread/read only; real inspect/plan/verify passed",
+  "selection_confirmed": true,
+  "execution_confirmed": false,
+  "ui_automation": "Explicitly denied; no bypass attempted",
+  "defaults_or_database_mutated_directly": false,
+  "workers_or_new_threads_created": false,
+  "paid_api_route": false,
+  "private_metadata_hashes": {
+    "active-chat-readback.json": "eb314b0f32d42f9f788932a2e09340f32419bdb0658a085673b278ebe729920d",
+    "active-chat-readback-2.json": "42f777fb516f33799e61f5df9bebc95d785316d97c460440eeb0bc43503a7089",
+    "active-chat-helper-readback.json": "d984d0583123af2dd5dc5ede1951f80cf8b17b8b72a72c91d68cfa221b898d6a"
+  },
+  "privacy": "Chat IDs, messages, authorization/resource records and local paths remain private",
+  "limits": [
+    "Configured/persisted model selection is not per-turn execution telemetry",
+    "No mid-turn inference switch or automatic next-turn continuation proven",
+    "Readback does not verify picker UI; computer use denied this app",
+    "Helper is a planner/readback guard, not an independent scheduler or permission authority",
+    "Existing manual fallback retained"
+  ],
+  "post_review_no_op_live_verification": {
+    "actual_helper_plan": "no_op",
+    "fresh_inspect_verify": "pass",
+    "source": "codex-app-server-thread-read",
+    "selection_confirmed": true,
+    "execution_confirmed": false,
+    "private_proof_sha256": "91b4b6b6c5eca4308d626f85a0e7876c3c7c4a847f3b506597b8eae05c0fa73b",
+    "additional_mutation": false
+  }
+}

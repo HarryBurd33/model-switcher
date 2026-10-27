@@ -11,7 +11,8 @@ Build observations apply to this Mac and installed Codex CLI 0.164.0, not every 
 | Persistence | Global AGENTS source loaded in both unrelated native threads and delivered in the desktop chat; policy preserved in existing checkpoints; no service |
 | Lifecycle | Instruction calls at meaningful phases; existing task-checkpoint hooks remain independent |
 | Automatic selected-model worker | Existing task-checkpoint qualified adapters; no new adapter here |
-| Active desktop model switch | No verified exposed mutation interface; user picker/manual handoff |
+| Native active-chat selection | Verified app-tool overrides plus host readback in the same active chat; subsequent turns only |
+| Mid-turn inference / automatic continuation | Not established; current turn can receive a steering cue without starting a new turn |
 | Effective desktop model/effort | Unknown unless trusted current-thread evidence exposes it; defaults alone insufficient |
 | Model availability/efforts | Live `model/list`, account-specific; recheck before launch |
 | Qualification | Exact model/effort/class/tools/privacy; existing narrow text evidence does not qualify coding |
@@ -45,11 +46,15 @@ deterministic fixtures; no live account was intentionally exhausted.
 Per-thread token reports and response times were observed. Parent coordination, helper
 review and all orchestration tokens are not fully attributable, so total workflow usage,
 subscription debit and dollar savings remain unknown. No-runtime recovery, automatic
-desktop mutation, native hook delivery of this companion, cross-device use and broad
+mid-turn inference switching, native hook delivery of this companion, cross-device use and broad
 coding quality were not established. Examples remain illustrations. See the delivery's
 validation report for case outcomes and limitations; do not call every check a full pass.
 
-The public package supplies policy and manual mode. The optional task-checkpoint worker
+The public package supplies policy/manual mode and a conditional native active-chat selection route. The optional task-checkpoint worker
 runtime is not bundled or currently distributed publicly by this project. Extra local
 profiles can share one skill using installer activate/deactivate commands; these manage
 only the profile’s global instruction block.
+
+Version 0.2.0 independently checks configured/latest-persisted model readback; those fields
+are not per-turn inference telemetry. Native messaging permission is scoped to the current
+human-authorized chat; guards do not create permission from saved task data.

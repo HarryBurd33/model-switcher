@@ -1,9 +1,9 @@
 ---
 name: model-switcher
-description: Route substantial multi-step work to suitable models and reasoning settings while conserving separate Codex allowance and API budgets. Use at task intake, expensive phases, handoff, scope changes, failed acceptance checks, or explicit $model-switcher. Keep trivial corrections lightweight; respect explicit model choices and routing opt-outs.
+description: Route substantial multi-step work to suitable models and reasoning settings while conserving separate Codex allowance and API budgets. Use at task intake, expensive phases, handoff, scope changes, failed acceptance checks, or explicit $model-switcher. Supports verified native same-chat selection for subsequent turns. Keep trivial corrections lightweight; respect explicit model choices and routing opt-outs.
 license: MIT
 metadata:
-  version: "0.1.1"
+  version: "0.2.0"
 ---
 
 # Model switcher
@@ -89,6 +89,14 @@ Automate only through a verified interface. A separate selected-model worker, an
 app-server thread override and a manual desktop model choice are different operations.
 Changing configuration defaults or launching a CLI child does not switch the current
 desktop chat. [Host capabilities and manual steps](references/host.md).
+
+If the native app tool exposes same-chat model/effort overrides and the user authorizes
+automatic selection in this chat, prefer the [guarded native route](references/active-chat.md)
+over requesting picker changes. Verify current chat identity, resources, a single durable
+transition intent and host readback. Skip unchanged selections and block unresolved jobs.
+This selects the model for subsequent turns. A configuration cue can arrive as steering
+in the current turn: it proves neither a new turn nor changed executing inference. Never
+repost the cue to force continuation or duplicate work.
 
 The receiver verifies intended task/project, artifact hashes and working state,
 prerequisites/tools, current authority, resource sufficiency, every uncertain job and
