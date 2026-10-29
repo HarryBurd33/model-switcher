@@ -127,7 +127,7 @@ fresh authority/resources before continuing. See both variants in the
 [handoff template](model-switcher/templates/handoff.md).
 
 **Automated workers are an optional external integration.** The documented integration
-uses task-checkpoint 0.5.0, its existing identity/store/lease/router, and independently
+uses the current installed task-checkpoint contract (tested with 0.8.3), its existing identity/store/lease, and independently
 qualified model/effort/tools/privacy assignments. That runtime is not bundled and is not
 currently supplied as a public dependency by this repository. Public installation alone
 provides policy/manual mode and the conditional native selection route, not automatic
@@ -163,3 +163,28 @@ Original files are [MIT licensed](LICENSE), including the installed skill. Depen
 rights remain separate; no external runtime source is vendored. Contributions should
 include a reproducible case and preserve existing fixed acceptance criteria and evidence.
 Do not include credentials or private task state in issues or pull requests.
+
+## Bounded native delivery validation
+
+With explicit temporary one-use scheduling permission, a live same-chat handoff
+passed: verified immutable checkpoint, Sol Medium configured readback, completed
+origin and distinct receiver, one-time claim, confirmed native schedule deletion
+before read-only work, then completion and release of the existing own lease.
+Configured selection is not per-turn inference telemetry.
+
+On the tested native host, immediate creates with `COUNT=1` were rejected before
+registration because no future run remained. A paused heartbeat with
+`FREQ=MINUTELY;INTERVAL=1;COUNT=3` was accepted. It provided at most three delivery
+opportunities; the receiver deleted it before work. The durable claim still allows
+only one task admission. Inspect each native receipt; do not retry an uncertain
+create, remove the finite bound, or turn this into indefinite polling.
+
+Across other projects, completed tasks and explicit stops remain stopped. A healthy
+checkpoint or adequate quota does not authorize domain work. Verify each chat
+independently and distinguish read-only readiness from actual automatic delivery.
+
+A sandbox may deny access to the existing daemon socket and report “Existing-server
+proxy exited before reply; no fallback.” Inspect the emitting boundary first. A
+permitted read-only retry with local socket access can verify selection; if access
+is unavailable, preserve the handoff. Never start another server, search profiles,
+change permissions or infer the configured model from a default.

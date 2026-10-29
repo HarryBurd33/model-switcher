@@ -246,3 +246,34 @@ including 15 behavioral routing cases. Three disposable Git fixtures saved and
 verified Sol Medium, Astra Extra High and Luna Low assignments through actual
 task-checkpoint 0.8.3 without a worker planner or recovery review. No model inference
 was invoked by those fixtures. New live handoff verification remains pending approval.
+
+
+## Authorized native follow-up — 2026-10-29
+
+The earlier 0.5 pending-approval result above is historical. The human subsequently
+authorized temporary one-use native handoff schedules across projects. One real
+same-chat test passed with a verified source-bound checkpoint, exact Sol Medium
+configured readback, completed origin and a distinct receiving turn. The receiver
+claimed the intent once, deleted its exact native heartbeat, received the guard
+execution permit and ran bounded read-only verification. It completed the operation,
+saved and verified a final checkpoint, then released only its own lease.
+
+All 16 installed skill files matched the published 0.5.0 package; the release ZIP
+checksum and recorded main/tag CI passed. Both profiles retained guidance, config,
+hooks and modes except for the explicit scheduling permission addition. Only the
+test chat changed effort; 39 other inspected selections were unchanged. Fresh
+account allowance was 45% remaining. No paid inference or domain implementation
+was invoked. Configured host metadata is not per-turn execution telemetry.
+
+Three immediate COUNT=1 rule variants failed validation before creation. A finite
+COUNT=3 minute rule was accepted, delivered once and was deleted before work.
+This confirms at-most-once admission for that observed handoff, not guaranteed
+delivery or future behavior in every chat. Cross-chat readiness and native
+automatic delivery remain separate acceptance claims.
+
+Cross-project follow-up independently verified configured model/effort readback in
+13 other owning chats through the supported existing-daemon proxy with permitted
+local socket access. Initial sandboxed readbacks in several chats failed before a
+reply. The permitted probe succeeded without a server start, model/config change
+or task write. This is a host-access diagnostic, not evidence of failed native
+continuation, and does not prove automatic delivery in those chats.
