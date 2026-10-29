@@ -62,6 +62,8 @@ class InstallerTests(unittest.TestCase):
     def test_upgrade_preserves_installed_owner_and_modes(self):
         import stat
         self.run_install()
+        self.global_file.write_text('User prefix\n'+self.global_file.read_text()+'User suffix\n')
+        original_global=self.global_file.read_bytes()
         paths=[self.target,self.target/'scripts',self.target/'SKILL.md']
         for path in paths:path.chmod(0o700 if path.is_dir() else 0o600)
         expected={str(p.relative_to(self.target)):(p.stat().st_uid,p.stat().st_gid,stat.S_IMODE(p.stat().st_mode)) for p in paths}
@@ -69,6 +71,7 @@ class InstallerTests(unittest.TestCase):
         self.run_install()
         actual={str(p.relative_to(self.target)):(p.stat().st_uid,p.stat().st_gid,stat.S_IMODE(p.stat().st_mode)) for p in paths}
         self.assertEqual(actual,expected)
+        self.assertEqual(self.global_file.read_bytes(),original_global)
 
     def test_customized_skill_blocks_update_and_removal(self):
         self.run_install()

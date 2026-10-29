@@ -277,7 +277,7 @@ def install(source, skills_dir, codex_home, activation=True, requested_mode=None
     new_block = block(target, mode) if activation else b''
     old_owned = receipt.get('block') if receipt else None
     remainder = global_without(current, old_owned)
-    new_global = remainder + new_block
+    new_global = current if new_block == decoded(old_owned) else remainder + new_block
     if receipt and files == receipt['files'] and encoded(new_block) == receipt.get('block'):
         return {'status': 'unchanged', 'target': str(target), 'automation_mode': mode}
     state.mkdir(parents=True, exist_ok=True)
