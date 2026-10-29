@@ -75,3 +75,22 @@ repeated per-chat opt-in. Model-only and effort-only changes share the verified 
 and one-use receiving procedure. Upgrades preserve mode; explicit choices/stops win.
 Global installation/loaded instructions cannot guarantee invocation in every existing
 chat or provide missing native tools. See the release validation for actual checks.
+
+## 0.5 bounded policy and compatibility
+
+A pure live-catalog recommender covers hard/easy/specialist model and effort policy,
+explicit choice/opt-out, Ultra delegation, supported-effort and overhead boundaries.
+Current 0.8 checkpoint commands replace retired review/planner requirements. Defaults
+are policy guidance, not benchmarks proving universal best-model performance.
+
+Existing native continuation guards remain unchanged. This repair case encountered
+automatic approval rejection of a recurring heartbeat before registration/selection;
+the local intent was cancelled after registry absence was confirmed. The new live
+distinct-receiver check remains pending explicit approval. Do not claim a new
+executing-model observation, workaround or universal future-chat guarantee.
+
+Offline 0.5 validation: 95 package/installer/native-guard/policy tests passed,
+including 15 behavioral routing cases. Three disposable Git fixtures saved and
+verified Sol Medium, Astra Extra High and Luna Low assignments through actual
+task-checkpoint 0.8.3 without a worker planner or recovery review. No model inference
+was invoked by those fixtures. New live handoff verification remains pending approval.

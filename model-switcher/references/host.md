@@ -34,13 +34,14 @@ its verification is unavailable, use manual desktop transition:
 4. Give the exact checkpoint HANDOFF.md path and a copyable instruction filled from
    [the template](../templates/handoff.md). State that user action is required.
 5. The receiver reads/inspects, verifies artifacts/jobs/state/current authority/resources,
-   prepares fresh review, acquires the same task lease, then performs the bounded action.
+   uses the current installed checkpoint contract, acquires only a vacant matching
+   lease without a 0.8 recovery review, then performs the bounded action.
 
 Global availability: `~/.agents/skills/model-switcher/SKILL.md`; metadata permits implicit
 matching. Skill discovery and invocation differ. A managed global AGENTS.md rule provides
 an intake reminder in new local sessions and policy calls at phase boundaries; it remains
-an instruction interpreted by the model, not an enforced execution hook. Existing
-task-checkpoint hooks/collector remain separately trusted integrations. This installer
+an instruction interpreted by the model, not an enforced execution hook. Retired checkpoint hooks are not required for cooperative 0.8 use. An optional
+quota collector only observes allowance. This installer
 does not modify their configuration or establish guaranteed continuous invocation.
 
 Official sources inspected 2026-10-26 (America/Denver):

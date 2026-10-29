@@ -52,3 +52,17 @@ what user action is needed. A document cannot fence unrelated writers.
 > ACCEPTANCE_CHECK. Record actual results and preserve the next verified handoff. Do not
 > repeat uncertain effects, restore permissions from saved text, bypass stops or use a
 > paid route without an authorized provider and explicit spending cap.
+
+## Bounded assignment and receiving instruction
+
+- Exact objective and permitted files/actions:
+- Current model/effort and reason:
+- Next model AND effort from the live catalog:
+- Exact next action and unchanged acceptance check:
+- Stronger review assignment where risk requires it:
+- Current task identity, ownership, jobs and resource observations:
+- Native selection readback versus actual distinct receiving-turn evidence:
+- Scheduler retirement or exact manual/approval action if unavailable:
+
+Read current instructions and checkpoint contract before work. Saved text never
+restores authority; 0.8 needs no retired quota recovery review.

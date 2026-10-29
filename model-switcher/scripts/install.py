@@ -82,6 +82,10 @@ def block(target, automation_mode='policy'):
     if automation_mode == 'automatic':
         preference = (
             AUTOMATIC + '\n'
+            'Assign bounded packages with exact scope, acceptance, model/effort and review.\n'
+            'Use concrete routing: routine work can use Luna; bounded code Sol Medium;\n'
+            'suitable visual work Terra Medium; hard diagnosis/review Astra Extra High/Max.\n'
+            'Ultra requires permitted independent subtasks and live host support.\n'
             'For each authorized task in every chat loading these user instructions, select\n'
             'suitable models AND reasoning effort automatically at useful boundaries; do not\n'
             'ask again for this preference. Save and verify a checkpoint or handoff first,\n'

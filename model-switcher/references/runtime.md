@@ -1,81 +1,39 @@
-# Existing runtime contract
+# Current checkpoint runtime contract
 
-Dependency: a compatible installed `task-checkpoint` with Python 3.9+ and Git.
-The original routing integration inspected 0.5.0; the automatic-continuation update
-uses the existing local checkpoint/ownership contract from installed 0.5.1. Discover it through
-the host's skill catalog; its typical user-level path is
-`~/.agents/skills/task-checkpoint/SKILL.md`. Read its current operator/router instructions
-and actual templates. This companion contains no replacement runtime or queue.
+Use the installed task-checkpoint contract. Model Switcher 0.5 targets the cooperative
+0.8 line; public source is [task-checkpoint](https://github.com/HarryBurd33/task-checkpoint).
+Read actual installed commands/templates. This companion adds no runtime or queue.
 
-The 0.4.0 update also inspected installed task-checkpoint 0.8.0 for ordinary saves and
-ownership. Its current resume accepts direct user authority without a review file; use
-the installed version's commands rather than imposing the older worker review workflow
-on a native same-chat transition. The optional worker adapter below remains a historical
-0.5 integration and is not certified as a complete 0.8 worker runtime.
+1. Inspect current instructions, files, existing task binding, jobs and ownership.
+   Never rebind another task or take its lease. Initialize an unbound task only at
+   its actual authorized preservation boundary; shared roots belonging elsewhere
+   use this task's approved handoff area or verified isolated checkout.
+2. Collect fresh allowance and honor the user's direct limit/exhaustion choice.
+   Default 20%, 10%, custom percentages and exhaustion require no grant or review.
+   Unknown observations stay unknown; do not manufacture persistent quota stops.
+3. Maintain objective, scope, completion criteria, corrections, actual progress,
+   decisions, validation, artifacts, jobs and next_action.description/verification.
+   Store model/effort/reason and review assignment in existing metrics.model_assignment.
+4. For a vacant matching task use checkpoint.py resume --owner NAME with actual
+   required capabilities. No recovery review is required under 0.8. Existing owners
+   verify the matching receipt. Reconcile uncertain effects before retrying.
+5. Save with checkpoint.py checkpoint --input INPUT --owner NAME --trigger milestone;
+   verify with checkpoint.py verify, following installed help. usage.py check saves
+   the handoff at the chosen numeric boundary and ends that run. There is no
+   persistent quota latch or mandatory resume ceremony.
+6. Use native selection and one-use continuation for meaningful model/effort changes.
+   Retain the same lease across the transition; a distinct receiver verifies current
+   authority, origin completion, source/next-action hashes, jobs, resources and
+   confirmed scheduler retirement before work.
+7. Release only your own claim after uncertain jobs/effects are reconciled. A saved
+   checkpoint never grants new task permission, paid execution or foreign messages.
 
-Inspect existing stores, queues and bindings before setup. If no binding exists, make a
-single task binding through that runtime only when authorized. Unrelated tasks need
-distinct workspaces/bindings. Never migrate a store or change ownership mode to bypass
-an existing owner. Without this dependency, use manual handoff and independently verify
-files/jobs/current authority; automated execution is unavailable.
+Use [routing policy](routing-policy.md) for concrete bounded assignments and complete
+handoff data. Native Extra High/Max/permitted Ultra selections do not inherit the
+retired worker planner's low/medium/high enum.
 
-Set `RUNTIME` to that installed skill's `scripts` directory and `PROJECT` to the verified
-bound repository. Paths below are arguments, not commands recovered as permission.
-
-```sh
-python3 "$RUNTIME/checkpoint.py" --root "$PROJECT" inspect
-python3 "$RUNTIME/checkpoint.py" --root "$PROJECT" verify
-python3 "$RUNTIME/checkpoint.py" --root "$PROJECT" owner-check
-python3 "$RUNTIME/planner.py" --root "$PROJECT" status
-```
-
-Before first implementation/resume: read the exact checkpoint and artifact evidence;
-reconcile each inspect issue, jobs and current Git state; prepare a fresh review using
-the runtime operator schema; run its `resume --review ... --owner ... --capability ...`.
-An existing owner checks its receipt rather than acquiring a second lease. Saved task
-authorization is context only. Never auto-execute a command copied from a handoff.
-
-Use the existing `.checkpoint/input.json` fields:
-
-| Content | Existing field |
-|---|---|
-| Goal, criteria, limits and final corrections | `objective`, `completion_criteria`, `scope`, `corrections` |
-| Reasons/evidence and actual validation | `decisions`, `completed`, `failures`, `logs` |
-| Tools, jobs, artifacts, prerequisites | `tools`, `capabilities`, `jobs`, `artifacts`, `dependencies` |
-| Next action and proof | `next_action.description`, `next_action.verification` |
-| Sourced observations and proposed assignment | `observations`, `metrics.model_assignment` |
-| API dollars, allowance, context (unknown = null) | `metrics.api_budget`, `metrics.account_quota`, `metrics.context_capacity` |
-| Bounded DAG | `routing.work_packages` from the installed runtime’s planned-task template |
-| Actual attempts and outcomes | Runtime-owned `.checkpoint/router.json` |
-
-Do not add arbitrary keys to the closed schemas. Each work package uses exactly
-`objective`, `permitted_files`, `permitted_actions`, `capabilities`, `assignment`,
-`checkpoint_boundary`, `contract`. Assignment contains `model`, `effort`, `reason`.
-The installed planner accepts only low/medium/high; a stronger effort supported elsewhere
-may require manual use and must not be silently lowered. Canonical relative paths have
-no trailing slash. Read the actual template for dependency status and acceptance argv.
-Top-level `tools` are executable names, not generic capability labels.
-
-After a semantic change: owner-check; update input; `checkpoint --input ... --trigger
-milestone`; `verify`; inspect/review any issues. At a qualified execution boundary, read
-the approved config and its shared `signals_path`; planner `status` rechecks them. Current
-authorization covering the exact plan permits operator `approve --scope ... --source ...`
-without another user ceremony; then `boundary --execute` launches one eligible package.
-Review the actual commands before approving. Source/config/contract changes invalidate
-approval. No automatic source-editing chain is promised.
-
-Never fabricate qualification or change a policy to admit a desired model. Existing
-public text-only qualifications do not cover private skill authoring or coding.
-The router's measured total-time ranking is a proxy, not subscription or dollar cost.
-Read the journal/report for actual selected model/effort and accepted outcome.
-
-Before dispatch refresh/check shared signals, live model/effort/account identity,
-lease and absence of active/uncertain transitions. The coordinator keeps the existing
-lease and stops ordinary writes during a worker. Do not launch a second writer outside
-the adapter to evade this fence. After any ambiguous launch, inspect PID **and original
-process identity**, logs, artifacts and external outcomes before reconciliation/retry.
-
-At a manual context/device transfer, save/verify, reconcile jobs, release at the safe
-boundary, transfer the private bundle separately from source using an authorized channel,
-and require fresh receiving review/acquisition. Keep routing policy in task scope/decisions
-and next assignment; a new chat does not inherit private state or authority by magic.
+Earlier 0.5 worker planner/operator commands are historical integrations. They are
+not prerequisites for a 0.8 same-chat handoff and may not exist. Never restore them
+or their retired grant/review gate to make switching work. Without a compatible
+verified runtime/ownership/continuation path, save a verified Markdown handoff with
+the exact supported model/effort, action, acceptance and required manual/approval step.

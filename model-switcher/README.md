@@ -1,8 +1,8 @@
-# Model Switcher 0.4.0
+# Model Switcher 0.5.0
 
 A user-level Codex policy for strong planning, economical qualified work and verified
 completion. Subscription allowance and API spending are separate resources. This is a
-thin companion to `task-checkpoint` 0.5.0; it installs no router, queue or background service.
+thin companion to the current cooperative `task-checkpoint` 0.8 line; it installs no router, queue or background service.
 
 ## Install and activate
 
@@ -51,10 +51,15 @@ The basic mode needs skill access, artifact read/write and a verified checkpoint
 Automated workers additionally need installed task-checkpoint, Python/Git, a correct
 binding, exclusive ownership, current authorization, qualified adapters, live model
 availability and resource sufficiency. Without optional integrations the skill gives a
-ready manual handoff. It requires no new paid service. The optional task-checkpoint runtime is not bundled
-and is not currently provided as a public dependency; manual mode works without it.
+ready manual handoff. It requires no new paid service. The optional task-checkpoint runtime is not bundled; its public source is
+[task-checkpoint](https://github.com/HarryBurd33/task-checkpoint). Manual handoff works without it.
 
 ## Use
+
+[Concrete bounded routing](references/routing-policy.md) assigns routine work to Luna,
+bounded code to Sol Medium, suitable visual work to Terra Medium, and hard diagnosis
+or review to Astra Extra High/Max. Ultra requires permitted independent subtasks.
+These are live-catalog-qualified defaults, not measured universal cost rankings.
 
 `$model-switcher Complete this feature with these acceptance tests.`
 

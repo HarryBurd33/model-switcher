@@ -3,7 +3,7 @@ name: model-switcher
 description: Route substantial work to suitable models and reasoning effort at intake, expensive phases, handoffs, scope changes and failed checks. Honor a user's global automatic-switching preference with brief reasons, verified checkpoints and guarded same-chat continuation. Keep trivial work lightweight, respect explicit model choices and opt-outs, and preserve separate Codex allowance and API budgets.
 license: MIT
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Model switcher
@@ -48,7 +48,8 @@ considered only while processing authorized work. [Setup and preference controls
 2. For substantial work, inspect objective, deliverables, acceptance criteria, risk,
    ambiguity, dependencies, instructions, artifacts, tests and existing checkpoint/jobs.
    Read the installed `task-checkpoint` skill when available. Reuse its task identity,
-   lease, `routing.work_packages`, journal and checkpoint store. Never initialize a
+   lease, semantic input, assignment metrics and checkpoint store. Use work-package
+   journal fields only when the installed runtime supports them. Never initialize a
    second queue or database for the same task. [Runtime procedure](references/runtime.md).
 3. Discover current tools, account restrictions, available models and supported
    efforts. Separate the effective current chat setting from a configured default.
@@ -67,11 +68,16 @@ call. Keep the policy and next assignment in semantic checkpoint state on resump
 
 ## Assign bounded work
 
+Use the [concrete routing policy](references/routing-policy.md) and its pure
+recommendation helper for hard/easy/specialist model AND effort assignments. Preserve
+exact scope, acceptance, next action and stronger review assignment. Recommendations
+do not grant execution or create a queue.
+
 5. Establish the overall plan and consequential decisions first. Define each package's
    objective, dependencies, permitted files/actions, tools/capabilities/privacy,
    unchanged acceptance criteria, proposed model/effort with reason, attempt/time/API
-   bounds, escalation condition and checkpoint boundary. Use the existing runtime's
-   planned-task template, not a new schema. Changed contracts receive new IDs.
+   bounds, escalation condition and checkpoint boundary. Use the installed runtime's current task template and semantic assignment fields;
+   do not require a removed worker planner or invent a new queue/schema. Changed contracts receive new IDs.
 6. Choose the least expensive **qualified** assignment likely to meet those checks.
    Consider lower reasoning on the same model. Qualification must cover model, effort,
    task class, tools and privacy; a text-only result does not qualify coding. Treat
@@ -82,11 +88,11 @@ call. Keep the policy and next assignment in semantic checkpoint state on resump
    consequences justify it; routine accepted work need not receive strongest review.
    In every consequential plan, explicitly name the review assignment and the acceptance
    gate before completion, including in a routing recommendation before execution.
-8. Check fresh shared signals and approved router configuration immediately before a
-   qualified dispatch. Review/attest the exact current plan, acceptance argv and scope
-   when already authorized; a saved approval cannot grant new authority. Never weaken
-   qualification or stops to force a route. If no qualified route exists, continue in
-   a suitable authorized current context or prepare manual handoff.
+8. Check fresh shared signals and the actual supported host configuration before a
+   transition. Recheck exact scope, acceptance and current authority; a saved record
+   cannot grant it. A current 0.8 same-chat handoff does not require a removed worker
+   planner approval. Never weaken quality or stops to force a route. If no qualified
+   route exists, use a suitable authorized current context or an exact manual handoff.
 
 ## Preserve separate resources
 
@@ -97,7 +103,8 @@ are account-wide; do not turn them into task tokens, task costs or API dollars.
 
 Honor existing reserves (including a configured 20% stop) and explicit stop events.
 Save/verify and stop ordinary work at a resource boundary. Changing models or accounts
-does not bypass that stop. Recovery needs fresh evidence and an explicit reviewed resume.
+does not bypass that stop. On task-checkpoint 0.8, current explicit continuation after fresh allowance is sufficient;
+there is no mandatory quota recovery review. Human holds and ownership still control.
 Unknown telemetry follows the configured manual/explicit-budget policy; never assume
 recovered capacity. API execution requires an authorized provider **and an explicit
 spending boundary**; subscription access never silently falls back to a paid API.
