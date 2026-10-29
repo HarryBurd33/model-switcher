@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import sys
 import tempfile
 
@@ -299,6 +300,17 @@ def install(source, skills_dir, codex_home, activation=True, requested_mode=None
     shutil.rmtree(temp)
     shutil.copytree(stage, temp)
     if target.exists():
+        for path in [temp, *temp.rglob('*')]:
+            prior_path = target / path.relative_to(temp)
+            if prior_path.exists():
+                expected = prior_path.stat()
+                actual = path.stat()
+                if hasattr(os, 'chown') and (actual.st_uid, actual.st_gid) != (expected.st_uid, expected.st_gid):
+                    os.chown(path, expected.st_uid, expected.st_gid)
+                shutil.copystat(prior_path, path)
+                actual = path.stat()
+                if (stat.S_IMODE(actual.st_mode), actual.st_uid, actual.st_gid) != (stat.S_IMODE(expected.st_mode), expected.st_uid, expected.st_gid):
+                    raise Conflict('Existing metadata could not be preserved; installation retained')
         shutil.rmtree(target)
     os.replace(temp, target)
     shutil.rmtree(stage)

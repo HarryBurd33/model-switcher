@@ -50,3 +50,5 @@ Official sources inspected 2026-10-26 (America/Denver):
 [Global AGENTS instructions](https://developers.openai.com/codex/guides/agents-md).
 Installed CLI help and runtime inspection supply the host-specific evidence; future
 documentation may describe features absent from that installed version.
+
+For a protected existing-daemon socket, follow the exact host-approved read-only inspector procedure in [active-chat](active-chat.md). Do not change native permissions to repair sandbox EPERM.

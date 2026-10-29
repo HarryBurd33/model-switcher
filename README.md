@@ -140,7 +140,7 @@ explicit spending boundary. Unknown telemetry and unmeasured savings remain unkn
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 scripts/build_release.py --output dist/model-switcher-0.5.0.zip
+python3 scripts/build_release.py --output dist/model-switcher-0.5.1.zip
 ```
 
 The build validates metadata, relative links, MIT notices and the explicit public file

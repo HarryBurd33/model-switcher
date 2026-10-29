@@ -27,6 +27,18 @@ class GuardError(ValueError):
     pass
 
 
+class SocketPermissionError(GuardError):
+    """An observation failure requiring the host's normal approval boundary."""
+    code = 'socket_permission_denied'
+
+
+def socket_permission_denied(stderr):
+    text = stderr.decode('utf-8', errors='replace').lower()
+    return 'failed to connect to socket' in text and any(
+        word in text for word in ('operation not permitted', 'permission denied', 'access is denied'))
+
+
+
 def require(condition, message):
     if not condition:
         raise GuardError(message)
@@ -153,9 +165,28 @@ class ProxyChannel:
         self.items = queue.Queue(maxsize=16)
         self.stopped = threading.Event()
         self.workers = []
+        self.stderr_prefix = bytearray()
+        self.stderr_done = threading.Event()
+        error_reader = threading.Thread(target=self._receive_stderr, daemon=True)
+        error_reader.start(); self.workers.append(error_reader)
         reader = threading.Thread(target=self._receive, daemon=True)
         reader.start()
         self.workers.append(reader)
+
+    def _receive_stderr(self):
+        # Drain continuously while retaining only a bounded diagnostic prefix.
+        try:
+            while not self.stopped.is_set():
+                chunk = self.process.stderr.read(4096)
+                if not isinstance(chunk, bytes) or not chunk:
+                    break
+                room = 8192 - len(self.stderr_prefix)
+                if room > 0:
+                    self.stderr_prefix.extend(chunk[:room])
+        except (OSError, ValueError):
+            pass
+        finally:
+            self.stderr_done.set()
 
     def remaining(self):
         remaining = self.deadline - time.monotonic()
@@ -304,10 +335,10 @@ def websocket_receive(channel):
     return value
 
 
-def inspect_selection(chat_id, executable='codex', timeout=20):
+def inspect_selection(chat_id, executable='codex', timeout=20, include_catalog=False):
     """Attach to the existing server through proxy WebSocket pipes; never auto-start.
 
-    Only initialize, initialized and thread/read are sent. Unsupported framing,
+    Only initialize, initialized, thread/read and optional model/list are sent. Unsupported framing,
     absence or uncertainty blocks. Deadlines bound userspace waits and cleanup;
     uninterruptible OS operations are not a hard real-time guarantee.
     """
@@ -317,7 +348,7 @@ def inspect_selection(chat_id, executable='codex', timeout=20):
     deadline = time.monotonic() + timeout
     work_deadline = deadline - min(2, timeout / 2)
     process = subprocess.Popen([executable, 'app-server', 'proxy'], stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0)
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
     channel = None
     messages_seen = 0
     def send(message):
@@ -346,11 +377,34 @@ def inspect_selection(chat_id, executable='codex', timeout=20):
         data = request(2, 'thread/read', {'threadId': chat_id, 'includeTurns': False})
         thread = object_field(data, 'thread')
         require(thread.get('id') == chat_id, 'Probe returned another chat')
-        return {'source': 'codex-app-server-thread-read',
+        result = {'source': 'codex-app-server-thread-read',
                 'transport': 'existing-server-proxy-websocket', 'server_start_attempted': False,
                 'observed_at': dt.datetime.now(dt.timezone.utc).isoformat(),
                 'thread': {key: thread.get(key) for key in
                            ('id', 'model', 'reasoningEffort', 'modelProvider', 'status')}}
+        if include_catalog:
+            catalog = request(3, 'model/list', {'limit': 100, 'includeHidden': False})
+            require(isinstance(catalog.get('data'), list) and not catalog.get('nextCursor'),
+                    'Complete live model catalog unavailable')
+            models = []
+            for item in catalog['data']:
+                require(isinstance(item, dict), 'Invalid live model catalog')
+                efforts = item.get('supportedReasoningEfforts', [])
+                require(isinstance(efforts, list), 'Invalid live model efforts')
+                models.append({'model': item.get('model'), 'efforts': [
+                    x.get('reasoningEffort') if isinstance(x, dict) else x for x in efforts]})
+            result['catalog'] = {'observed_at': dt.datetime.now(dt.timezone.utc).isoformat(),
+                                 'source': 'existing-server-model-list', 'data': models}
+        return result
+    except GuardError:
+        if channel is not None:
+            channel.stderr_done.wait(timeout=max(0, min(.1, deadline-time.monotonic())))
+            if socket_permission_denied(bytes(channel.stderr_prefix)):
+                raise SocketPermissionError(
+                    "Host denied access to the existing Codex daemon socket. Use the host's "
+                    "approved read-only command boundary when authorized; do not change socket "
+                    "permissions, profiles, or start a server.") from None
+        raise
     finally:
         if channel is not None:
             channel.stopped.set()
@@ -371,7 +425,7 @@ def inspect_selection(chat_id, executable='codex', timeout=20):
             except subprocess.TimeoutExpired:
                 raise GuardError('Existing-server proxy cleanup outcome unknown')
         finally:
-            process.stdin.close(); process.stdout.close()
+            process.stdin.close(); process.stdout.close(); process.stderr.close()
             for worker in channel.workers if channel is not None else []:
                 worker.join(timeout=max(0, deadline - time.monotonic()))
         require(channel is None or not any(worker.is_alive() for worker in channel.workers),
@@ -394,6 +448,7 @@ def main(argv=None):
     check.add_argument('--request', type=Path, required=True)
     check.add_argument('--readback', type=Path, required=True)
     probe = commands.add_parser('inspect'); probe.add_argument('--chat-id', required=True)
+    probe.add_argument('--include-catalog', action='store_true')
     probe.add_argument('--timeout', type=float, default=20); probe.add_argument('--codex', default='codex')
     args = parser.parse_args(argv)
     try:
@@ -402,11 +457,14 @@ def main(argv=None):
         elif args.command == 'verify':
             result = verify(read_json(args.request), read_json(args.readback))
         else:
-            result = inspect_selection(args.chat_id, args.codex, args.timeout)
+            result = inspect_selection(args.chat_id, args.codex, args.timeout, args.include_catalog)
         print(json.dumps(result, indent=2))
         return 0
     except (GuardError, OSError, ValueError, TypeError, KeyError) as error:
-        print(json.dumps({'status': 'blocked', 'reason': str(error)}), file=sys.stderr)
+        result = {'status': 'blocked', 'reason': str(error)}
+        if isinstance(error, SocketPermissionError):
+            result.update(code=error.code, requires_host_approval=True, server_start_attempted=False)
+        print(json.dumps(result), file=sys.stderr)
         return 2
 
 

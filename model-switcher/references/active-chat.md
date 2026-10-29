@@ -115,3 +115,24 @@ Source evidence: [proxy dispatch](https://github.com/openai/codex/blob/6aaac6948
 This establishes the transport path, not universal host availability or globally
 write-free CLI behavior. Earlier successful selection observations retain their
 historical scope; they do not certify the current transport on another host.
+
+## Protected socket access (0.5.1)
+
+A sandbox can deny the existing control socket even when the CLI and daemon work.
+The inspector returns `socket_permission_denied` with `requires_host_approval:true`
+when the bounded proxy diagnostic identifies that specific failure. A PATH-alias
+warning alone is not such evidence. Raw stderr and profile paths are not returned.
+When current authority covers the exact chat's read-only metadata, use the host's
+normal per-command approval boundary for that exact inspector command. This is
+separate from changing OS/file permissions. If approval is denied or unavailable,
+keep the verified handoff and stop the transition. Never chmod/chown the socket,
+change profiles, add a broad allowlist, start another server, or retry automatically.
+
+`inspect --chat-id ACTUAL_ID --include-catalog` additionally reads `model/list`
+through the same existing-daemon connection. It returns normalized supported
+models/efforts with a fresh timestamp; incomplete catalogs fail closed. The fixed
+RPC list remains read-only and starts no model turn. Preserve permission evidence
+and use the same approved boundary for the receiver's metadata readback.
+
+Official boundaries: [permissions](https://learn.chatgpt.com/docs/permissions),
+[app-server protocol](https://learn.chatgpt.com/docs/app-server).

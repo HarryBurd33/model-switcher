@@ -100,7 +100,7 @@ def export(root, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=Path('dist/model-switcher-0.5.0.zip'))
+    parser.add_argument('--output', type=Path, default=Path('dist/model-switcher-0.5.1.zip'))
     parser.add_argument('--export-dir', type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]

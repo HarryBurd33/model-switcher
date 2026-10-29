@@ -178,7 +178,7 @@ def decode_client_wire(wire):
 
 class ProxyTests(unittest.TestCase):
     def process(self, data=b''):
-        process = mock.Mock(stdin=io.BytesIO(), stdout=io.BytesIO(data))
+        process = mock.Mock(stdin=io.BytesIO(), stdout=io.BytesIO(data), stderr=io.BytesIO())
         process.stdin.close = mock.Mock()
         process.poll.return_value = None
         process.wait.return_value = 0
@@ -192,7 +192,7 @@ class ProxyTests(unittest.TestCase):
             finally:
                 launch.assert_called_once_with(['codex', 'app-server', 'proxy'],
                     stdin=active.subprocess.PIPE, stdout=active.subprocess.PIPE,
-                    stderr=active.subprocess.DEVNULL, bufsize=0)
+                    stderr=active.subprocess.PIPE, bufsize=0)
                 self.assertGreaterEqual(process.wait.call_count, 1)
                 process.stdin.close.assert_called_once()
                 self.assertTrue(process.stdout.closed)
@@ -216,6 +216,54 @@ class ProxyTests(unittest.TestCase):
         self.assertEqual(result['thread']['id'], 'chat-one')
         process.terminate.assert_called_once(); process.wait.assert_called_once()
         process.kill.assert_not_called()
+
+    def test_socket_denial_is_precise_and_raw_stderr_is_not_disclosed(self):
+        process = self.process()
+        process.poll.return_value = 1
+        process.stderr = io.BytesIO(b'private-secret\nError: failed to connect to socket at /private/profile/control.sock\nOperation not permitted')
+        with self.assertRaises(active.SocketPermissionError) as caught:
+            self.inspect(process)
+        self.assertNotIn('private-secret', str(caught.exception))
+        self.assertEqual(caught.exception.code, 'socket_permission_denied')
+        process.terminate.assert_not_called()
+
+    def test_path_alias_warning_alone_does_not_claim_socket_denial(self):
+        process = self.process()
+        process.stderr = io.BytesIO(b'PATH aliases: Operation not permitted')
+        with self.assertRaises(active.GuardError) as caught:
+            self.inspect(process)
+        self.assertNotIsInstance(caught.exception, active.SocketPermissionError)
+
+    def test_cli_socket_denial_is_structured_and_does_not_repeat(self):
+        import contextlib
+        out=io.StringIO()
+        with mock.patch.object(active, 'inspect_selection', side_effect=active.SocketPermissionError('Host denied existing socket')) as probe, contextlib.redirect_stderr(out):
+            code=active.main(['inspect','--chat-id','chat-one'])
+        self.assertEqual(code,2);probe.assert_called_once()
+        value=json.loads(out.getvalue())
+        self.assertEqual(value['code'],'socket_permission_denied')
+        self.assertTrue(value['requires_host_approval']);self.assertFalse(value['server_start_attempted'])
+
+    def test_optional_catalog_uses_fixed_read_only_model_list(self):
+        catalog=server_frame({'id':3,'result':{'data':[{'model':'gpt-6-astra','supportedReasoningEfforts':[{'reasoningEffort':'xhigh'}]}],'nextCursor':None}})
+        process=self.process(upgrade_response()+metadata_reply()+catalog)
+        with mock.patch.object(active.os,'urandom',side_effect=lambda size:b'K'*size), mock.patch.object(active.subprocess,'Popen',return_value=process):
+            result=active.inspect_selection('chat-one',include_catalog=True)
+        messages=[json.loads(payload) for opcode,payload in decode_client_wire(process.stdin.getvalue())[1] if opcode==1]
+        self.assertEqual([m['method'] for m in messages],['initialize','initialized','thread/read','model/list'])
+        self.assertEqual(result['catalog']['data'],[{'model':'gpt-6-astra','efforts':['xhigh']}])
+        self.assertFalse(result['server_start_attempted'])
+
+    def test_incomplete_optional_catalog_blocks_without_another_request(self):
+        catalog=server_frame({'id':3,'result':{'data':[],'nextCursor':'more'}})
+        process=self.process(upgrade_response()+metadata_reply()+catalog)
+        with mock.patch.object(active.os,'urandom',side_effect=lambda size:b'K'*size), mock.patch.object(active.subprocess,'Popen',return_value=process) as launch:
+            with self.assertRaisesRegex(active.GuardError,'Complete live model catalog'):
+                active.inspect_selection('chat-one',include_catalog=True)
+        launch.assert_called_once()
+        messages=[json.loads(payload) for opcode,payload in decode_client_wire(process.stdin.getvalue())[1] if opcode==1]
+        self.assertEqual(messages[-1]['method'],'model/list')
+        self.assertEqual(len(messages),4)
 
     def test_absent_server_exits_without_retry_or_fallback(self):
         process = self.process()

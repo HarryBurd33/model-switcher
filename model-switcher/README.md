@@ -1,4 +1,4 @@
-# Model Switcher 0.5.0
+# Model Switcher 0.5.1
 
 A user-level Codex policy for strong planning, economical qualified work and verified
 completion. Subscription allowance and API spending are separate resources. This is a
@@ -115,7 +115,7 @@ state, account identities, approvals, raw logs and credentials are excluded.
 
 Original companion files are MIT licensed. No task-checkpoint or Codex source is copied.
 The installed task-checkpoint runtime is an external dependency with independent update
-and licensing history. Its installed 0.5.0 snapshot was inspected; installed revision
+and licensing history. Its installed 0.5.1 snapshot was inspected; installed revision
 cannot be equated to a different source checkout. Official reference pages:
 [Build skills](https://learn.chatgpt.com/docs/build-skills),
 [App server](https://learn.chatgpt.com/docs/app-server),
