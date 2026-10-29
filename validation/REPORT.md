@@ -1,3 +1,96 @@
+# Model Switcher validation — 0.4.0
+
+2026-10-29. The current user requested automatic model and reasoning-effort switching
+as a standing preference across their Codex chats, with a brief reason and verified
+checkpoint/handoff resume, plus synchronization of the public repository.
+
+The earlier global block requested routing but did not authorize automatic selection
+or continuation. The updated installer exposes explicit `--automatic` and `--manual`
+profile preferences. A loaded automatic instruction covers the authorized tasks in that
+profile without repeated per-chat opt-in; fresh installs without that flag still grant
+no automatic authority. Upgrades preserve the recorded mode. Secondary profiles need
+their own explicit preference. Existing receipts, custom-file conflict protection,
+unrelated instructions and primary/shared ownership remain intact.
+
+**80 tests passed**, including eight new executed installer lifecycle cases and all
+72 existing selection/transport/continuation/package regressions. The new cases exercise
+saved automatic instructions, no-flag upgrades, manual downgrade, rollback to both
+legacy policy and automatic preferences, separate profile consent, malformed options
+before writes and customization refusal. This is executed local behavior, not proof
+that every model follows an instruction in every chat.
+
+Instructions now treat model-only and effort-only changes alike: verified handoff with
+exact next action and acceptance check, current native selection/readback, one-use
+continuation, and brief proposed/selected/scheduled/resumed status with a concrete reason.
+Unchanged selections, trivial work, explicit model choices, stop/cancel, uncertain jobs
+and unsupported hosts retain their existing boundaries. Global preference comes from
+current human instructions, never from a checkpoint receipt. No installer schedule,
+new daemon, account change, API spend or unrelated-chat message is introduced.
+
+A fresh read-only existing-server proxy inspection succeeded in the actual current
+chat and reported configured/latest-persisted Sol / High. The sandboxed probe was unable
+to connect; the same supported read-only command succeeded with authorized local-server
+access. No model change or new inference was part of that inspection. This does not
+establish which model executed a particular turn. Live continuation was then observed: the origin completed, a distinct heartbeat turn
+verified source/checkpoint/authority/resources, acquired the one-use claim, deleted its
+exact schedule with confirmed retirement and received execute:true before publication
+work. This establishes a real checkpoint-based resume, not per-turn inference telemetry.
+
+Public release validation also includes independent contract review, installed file and
+profile-block verification, deterministic ZIP/extracted rebuild, sanitized export and
+remote CI/release checks. Exact final results are recorded in global-defaults-check.json
+and global-defaults-review.md. Historical checks below keep their original scope.
+
+---
+
+# Model Switcher validation — 0.3.1
+
+The first-use review identified a dependency gap in the earlier metadata inspector:
+`app-server --stdio` starts a new server and may resolve persisted remote-control state.
+The supported existing-daemon proxy avoids that startup, but requires WebSocket framing.
+The current candidate adds bounded framing and refuses missing/incompatible transport
+without starting a server or searching for another profile. The complete source suite passed **72 tests in 2.886 seconds**, including 24 active-chat
+transport/selection cases. Independent Astra source review found no blocker. One real
+proxy inspection completed successfully after a single authorized native selection;
+the helper confirmed the exact same chat's latest-persisted GPT-6.1 Sol / Ultra setting.
+No server start or configuration change was attempted. A prior guessed-path absence
+was not evidence of daemon absence; the supported proxy resolved the actual endpoint.
+
+Automatic continuation remains unverified until a distinct receiving turn claims once
+and retires its schedule. The successful metadata readback is separate from that future
+acceptance and does not prove the executing model of a turn.
+
+---
+
+# Model Switcher validation — 0.3.0
+
+2026-10-27. Current requested extension is automatic same-chat continuation after an
+explicitly authorized model transition. The helper reuses the existing checkpoint
+store/lease and keeps one active intent plus immutable intent/spent/outcome receipts.
+It never messages, schedules or invokes a model itself.
+
+Thirty focused offline tests passed. They cover origin/receiving turn distinction,
+wrong/stale/context/selection/resource/authority/lease/job evidence, expiry, cancellation,
+concurrent claims and retirements, one executable emission, lost/uncertain results,
+changed operation IDs, scheduler-retirement failure and cleanup under stop/revocation/
+low quota. The complete source regression suite passed **61 tests in 2.426 seconds**, including
+the original 31 selection/installer/package cases.
+Independent Astra review found no blocking defect. Inputs remain cooperating operator
+attestations rather than authentication or per-turn model telemetry.
+
+Native end-to-end continuation has **not yet been observed**. A bounded first use is
+planned in the human-authorized receiving chat after installation: configured selection,
+recorded native heartbeat, completed origin, different receiving turn, one claim,
+confirmed scheduler retirement, then the exact bounded continuation. Its real receipt
+must be recorded separately; offline tests alone cannot certify that delivery or prove
+which model executed a turn. No task continuation or new scheduler is implied by install.
+
+Historical evidence below is preserved with its original scope. Private current task
+state, identity/lease details, raw account observations and scheduler records are excluded
+from public packaging. This candidate adds no paid API fallback or autonomous service.
+
+---
+
 # Model Switcher validation — 0.2.0
 
 ## Native same-chat model selection

@@ -1,4 +1,4 @@
-# Model Switcher 0.2.0
+# Model Switcher 0.4.0
 
 A user-level Codex policy for strong planning, economical qualified work and verified
 completion. Subscription allowance and API spending are separate resources. This is a
@@ -12,6 +12,14 @@ Review the folder, especially `SKILL.md` and `scripts/install.py`, then from thi
 python3 scripts/install.py install
 python3 scripts/install.py status
 ```
+
+For your requested default of automatic model and effort switching plus checkpoint-bound
+continuation in every chat loading this profile, run `python3 scripts/install.py install
+--automatic`. This saves a standing human instruction; no repeated per-chat opt-in is
+needed. `install --manual` disables automatic selection and continuation for the profile.
+No mode flag preserves the existing preference on update; a fresh install defaults to
+policy guidance without granting automatic authority. `status` reports `automation_mode`
+as `automatic`, `manual`, `policy` or `disabled` (no managed global block).
 
 Default destination: `~/.agents/skills/model-switcher/`. Default global instruction file:
 `${CODEX_HOME:-~/.codex}/AGENTS.md`. Explicit locations use `--skills-dir PATH` and
@@ -33,6 +41,8 @@ verify the loaded sources and reconcile precedence rather than editing unrelated
 
 For another local Codex profile, run `python3 scripts/install.py activate --codex-home PROFILE_HOME`.
 This manages only that profile’s global instruction block and shares the primary skill.
+Add `--automatic` to `activate` to enable the standing preference there too; consent is
+profile-specific. An unflagged activation preserves that profile's existing mode.
 Use `deactivate` with the same profile home before uninstalling the primary shared skill.
 `status` reports whether a profile owns the skill or only activation. Other devices need
 independent installation.
@@ -55,8 +65,21 @@ It preserves user choices and skips expensive orchestration for trivial work. Se
 [manual switching](references/host.md). A selected CLI worker is separate from the active
 desktop conversation. The [native route](references/active-chat.md) can automatically select this same chat’s
 model/effort for subsequent turns when explicitly authorized and supported. It does not
-change already-running inference or guarantee an automatic next turn. Manual fallback
-remains when the native tool/readback is unavailable.
+change already-running inference. The optional [continuation procedure](references/continuation.md)
+adds a one-use scheduled handoff after verified selection when the user authorizes it,
+including through the currently loaded global automatic preference.
+No scheduler is installed by setup; runtime continuation requires the native heartbeat
+tool and existing checkpoint lease. Delivery and actual new-turn behavior must be
+verified separately. Manual fallback remains when those surfaces are unavailable.
+
+A justified model-only, effort-only or combined switch saves/verifies a checkpoint,
+records the exact next action and acceptance check, then selects/verifies the target
+and requests resume through that procedure. A brief notice names the model/effort and
+concrete reason; it distinguishes selected, scheduled and actually resumed. No-op
+selections and trivial tasks do not create switches. Explicit model choices, opt-outs,
+stops, permissions and resource limits still control. The global preference covers
+authorized work, not new external actions or spending. Existing chats need to load the
+updated instructions; no message is broadcast to other chats during setup.
 
 ## Update, rollback, uninstall
 

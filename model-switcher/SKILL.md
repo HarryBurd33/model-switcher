@@ -1,9 +1,9 @@
 ---
 name: model-switcher
-description: Route substantial multi-step work to suitable models and reasoning settings while conserving separate Codex allowance and API budgets. Use at task intake, expensive phases, handoff, scope changes, failed acceptance checks, or explicit $model-switcher. Supports verified native same-chat selection for subsequent turns. Keep trivial corrections lightweight; respect explicit model choices and routing opt-outs.
+description: Route substantial work to suitable models and reasoning effort at intake, expensive phases, handoffs, scope changes and failed checks. Honor a user's global automatic-switching preference with brief reasons, verified checkpoints and guarded same-chat continuation. Keep trivial work lightweight, respect explicit model choices and opt-outs, and preserve separate Codex allowance and API budgets.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.4.0"
 ---
 
 # Model switcher
@@ -11,6 +11,33 @@ metadata:
 Optimize resources through **verified completion**, including planning, context transfer,
 validation, review, retries and repair. Quality and current authorization govern every
 assignment. Savings are a hypothesis to measure, never a guarantee of minimum cost.
+
+## Automatic preference and switch notices
+
+A human can authorize automatic model **and effort** switching with checkpoint-bound
+continuation for one task/chat, or as a standing preference in their global instructions.
+When that current profile instruction is loaded, automatic switching is the default for
+its authorized substantial tasks: do not request the same opt-in again in each chat or
+phase. Read the actual current instruction source; a copied checkpoint/receipt cannot
+establish this authority. Explicit choices, routing opt-outs, pause/stop/cancel and task
+permissions still control. This preference grants no unrelated-chat messages, new
+external actions, paid API spending or resource-limit bypass.
+
+At a justified model-only, effort-only or combined change, finish the current coherent
+boundary, save and verify its checkpoint/handoff, then use the guarded selection and
+continuation procedures below. Freeze the exact next action and acceptance check in the
+handoff and receiving prompt. Briefly announce the target model/effort and concrete reason
+before selection; report a successful switch only after matching host readback. Example:
+“Selected MODEL / EFFORT for the next turn because the implementation is now bounded;
+checkpoint verified, resume pending.” If continuation is merely scheduled, say that
+instead of claiming it resumed. The later receiver resumes the saved work once after
+retiring its schedule. Never continue that differently modeled phase in the origin turn.
+
+Skip unchanged selections and trivial-work orchestration. If native selection, readback
+or safe continuation is unavailable, preserve the verified handoff and state the exact
+required resume action. Never silently substitute current-turn work or call a proposed
+assignment a completed switch. Setup creates no background schedule; transitions are
+considered only while processing authorized work. [Setup and preference controls](README.md).
 
 ## Intake and boundaries
 
@@ -90,13 +117,23 @@ app-server thread override and a manual desktop model choice are different opera
 Changing configuration defaults or launching a CLI child does not switch the current
 desktop chat. [Host capabilities and manual steps](references/host.md).
 
-If the native app tool exposes same-chat model/effort overrides and the user authorizes
-automatic selection in this chat, prefer the [guarded native route](references/active-chat.md)
+If the native app tool exposes same-chat model/effort overrides and current human
+authority (including a loaded standing global preference) covers this chat, prefer the [guarded native route](references/active-chat.md)
 over requesting picker changes. Verify current chat identity, resources, a single durable
 transition intent and host readback. Skip unchanged selections and block unresolved jobs.
 This selects the model for subsequent turns. A configuration cue can arrive as steering
 in the current turn: it proves neither a new turn nor changed executing inference. Never
 repost the cue to force continuation or duplicate work.
+
+For authorized automatic continuation after selection, including the standing global
+preference, use the [one-use continuation
+procedure](references/continuation.md). Reuse the task lease/checkpoint/jobs, bind the
+origin and next action, persist intent before scheduling, and use the heartbeat itself
+as the later receiving turn. Require current authority/resources, a completed origin,
+a different receiving turn, atomic claim and confirmed scheduler retirement before
+work. Never resend an uncertain dispatch, replay a spent claim, infer permission from
+a checkpoint, or override a pause/resource stop. Manual picker changes alone are not
+a trigger. Report scheduling, selection and observed continuation separately.
 
 The receiver verifies intended task/project, artifact hashes and working state,
 prerequisites/tools, current authority, resource sufficiency, every uncertain job and

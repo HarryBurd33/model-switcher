@@ -23,6 +23,14 @@
   sharing the allowance nor a healthy secondary reading clears the persisted stop.
 - **Exclusion:** “Do not route this task; stay on my selected model.” Honor that choice.
   Mention a real capability boundary only if it prevents the requested acceptance.
+- **Global automatic preference:** The current global instructions authorize automatic
+  model/effort selection and continuation. At a bounded phase, a qualified lower-effort
+  assignment is worthwhile. Save/verify its handoff, select/verify the same model at
+  that effort, briefly explain the change and schedule resume of the exact next action.
+  End the origin turn; the one-use receiver retires scheduling before work. Do not ask
+  for the same per-chat opt-in again or describe scheduling as observed resumption.
+- **Global preference plus stop:** The user now says “save and stop.” Save the handoff
+  and stop; the standing preference cannot schedule task work against this instruction.
 
 Explicit invocation: `$model-switcher Complete this feature with the supplied tests.`
 Implicit candidate: “Design the migration, implement bounded steps and verify recovery.”

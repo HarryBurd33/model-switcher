@@ -11,14 +11,19 @@ separate resources, and counts handoff, validation, review, retries and repair a
 - Keeps acceptance criteria, privacy, explicit model choices and stop policies intact.
 - Automatically selects this active chat’s model/effort for subsequent turns when the
   native app interface is present and this chat’s user has authorized it.
+- Can schedule a guarded automatic continuation after that transition when explicitly
+  authorized, including by a saved global preference, using one checkpoint-bound claim
+  and retiring the schedule before work.
+- Briefly explains each model or effort change and resumes its saved next action from
+  a verified checkpoint/handoff when the host supports automatic continuation.
 - Produces a verified manual handoff when an automatic route is unavailable.
 - Installs a user-wide skill and global instructions requesting its use for substantial
   work. Trivial corrections stay lightweight.
 
 This is an instruction policy with tested setup and a guarded native selection route.
 It can update the same active chat’s selected model/effort for subsequent turns. It does
-not switch an inference already running, guarantee automatic next-turn execution,
-invocation in every chat, or lower cost. Global instructions are interpreted by Codex; project overrides, opt-outs, alternate
+not switch an inference already running or guarantee delivery, invocation in every
+chat, exactly-once external effects, or lower cost. Global instructions are interpreted by Codex; project overrides, opt-outs, alternate
 profiles and host capabilities still apply. A selected-model CLI worker is a separate
 operation. [Capabilities and evidence](model-switcher/references/capabilities.md).
 
@@ -35,6 +40,29 @@ python3 model-switcher/scripts/install.py install
 python3 model-switcher/scripts/install.py status
 ```
 
+To make automatic model **and reasoning effort** switching with checkpoint-based resume
+your default in every chat using this Codex profile, run:
+
+```sh
+python3 model-switcher/scripts/install.py install --automatic
+```
+
+This saves your standing instruction in the managed global block. It authorizes suitable
+same-chat transitions and bounded resume of already authorized tasks without another
+per-chat opt-in. Each switch saves/verifies the handoff, selects/verifies the target,
+briefly names the model/effort and reason, then schedules the saved next action and ends
+the origin turn. The guarded receiver resumes once after retiring the schedule.
+It never changes an inference already running. An unavailable interface yields a ready
+handoff with the required action. Installation creates no schedule or background service.
+
+Use `install --manual` to return this profile to recommendations/manual handoffs.
+Updates without either flag preserve the saved mode; a fresh install without either
+flag supplies policy guidance and requires explicit automatic authorization. `status`
+reports `automation_mode`. An explicit current model/effort choice, opt-out or stop
+overrides the standing preference. Automatic mode adds no paid API or external-action
+permissions. Existing chats may need a new turn or reopening to load changed global
+instructions; it does not broadcast instructions to other chats.
+
 Default skill location: `~/.agents/skills/model-switcher`. Default global instructions:
 `$CODEX_HOME/AGENTS.md`, or `~/.codex/AGENTS.md` when CODEX_HOME is unset. Existing text
 and configuration are preserved. No hook trust, account setting, model default, queue,
@@ -48,7 +76,8 @@ $model-switcher Implement this feature and verify the supplied acceptance tests.
 ```
 
 You can also say “Use Model Switcher for this task.” To opt out: “Stay on my selected
-model and do not route or delegate this task.” To authorize native automatic selection once for the current chat/task, say:
+model and do not route or delegate this task.” Without a global automatic preference,
+to authorize native automatic selection once for the current chat/task, say:
 
 ```text
 $model-switcher Automatically select models and reasoning effort in this chat.
@@ -57,6 +86,20 @@ $model-switcher Automatically select models and reasoning effort in this chat.
 The native route uses a user-visible configuration cue and verifies host readback.
 It requires the Codex app messaging tool plus the CLI for readback; CLI-only and
 unverified hosts retain manual fallback. [Native procedure](model-switcher/references/active-chat.md).
+
+Without the standing preference, to also continue without another typed resume message,
+explicitly request:
+
+```text
+Use Model Switcher to change models and automatically continue this task at safe
+boundaries, preserving its checkpoint and preventing duplicate work.
+```
+
+This opts in only the current task. Follow the [continuation procedure](model-switcher/references/continuation.md);
+manual picker changes alone do not trigger it. Context and control state stay private.
+The same-chat heartbeat is the receiver, not a message-sending loop. Current permissions,
+resource stops and cancellation still apply. Native acceptance is reported separately
+from offline guard tests.
 
 When a manual transition is useful, follow
 the packet's exact model/effort, picker steps and resume instruction.
@@ -68,6 +111,9 @@ profile's own global instructions:
 python3 model-switcher/scripts/install.py activate --codex-home /absolute/path/to/other-codex-home
 python3 model-switcher/scripts/install.py status --codex-home /absolute/path/to/other-codex-home
 ```
+
+Add `--automatic` to `activate` to save the same standing preference in that profile.
+Profiles retain independent preferences; sharing the skill does not copy consent.
 
 The extra profile owns only its activation block, never the shared skill. On another
 device, install there independently. `--no-global` with `install` supplies discovery only.
@@ -94,7 +140,7 @@ explicit spending boundary. Unknown telemetry and unmeasured savings remain unkn
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 scripts/build_release.py --output dist/model-switcher-0.2.0.zip
+python3 scripts/build_release.py --output dist/model-switcher-0.4.0.zip
 ```
 
 The build validates metadata, relative links, MIT notices and the explicit public file

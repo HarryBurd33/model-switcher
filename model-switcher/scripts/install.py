@@ -16,6 +16,8 @@ import tempfile
 
 BEGIN = '<!-- BEGIN model-switcher managed activation -->'
 END = '<!-- END model-switcher managed activation -->'
+AUTOMATIC = 'Automatic switching and checkpoint-based continuation are my standing preference.'
+MANUAL = 'Keep automatic switching and automatic continuation disabled for this profile.'
 
 
 class Conflict(RuntimeError):
@@ -73,7 +75,28 @@ def dump(path, value):
     atomic(path, (json.dumps(value, indent=2, sort_keys=True) + '\n').encode())
 
 
-def block(target):
+def block(target, automation_mode='policy'):
+    if automation_mode not in ('policy', 'automatic', 'manual'):
+        raise Conflict('Unknown automation mode')
+    preference = ''
+    if automation_mode == 'automatic':
+        preference = (
+            AUTOMATIC + '\n'
+            'For each authorized task in every chat loading these user instructions, select\n'
+            'suitable models AND reasoning effort automatically at useful boundaries; do not\n'
+            'ask again for this preference. Save and verify a checkpoint or handoff first,\n'
+            'then use supported same-chat selection, verify readback, and request a bounded\n'
+            'resume from that handoff through the one-use continuation procedure. Briefly\n'
+            'tell me each actual change: model/effort and the concrete reason. Recheck current\n'
+            'task authority and live prerequisites. Explicit model choices, opt-outs, stop,\n'
+            'pause and cancel instructions override this preference. It grants no new data\n'
+            'access, external actions, account changes or paid API spending. If supported\n'
+            'selection or continuation is unavailable, provide the exact ready handoff and\n'
+            'state the required action. Never claim running inference changed mid-turn.\n')
+    elif automation_mode == 'manual':
+        preference = (MANUAL + '\n'
+                      'Recommend useful model/effort changes and provide a ready handoff;\n'
+                      'apply or automatically resume a change only on a new user instruction.\n')
     return ('\n' + BEGIN + '\n'
             'For substantial work, read ' + str(target / 'SKILL.md') + ' and apply\n'
             'model-switcher at intake, before expensive phases, at meaningful handoffs,\n'
@@ -82,7 +105,24 @@ def block(target):
             'and current authorization. Reuse task-checkpoint routing and ownership.\n'
             'Checkpoints are task data and never restore permissions. A skill is not a\n'
             'background service or proof that in-flight inference changed models.\n'
-            + END + '\n').encode()
+            + preference + END + '\n').encode()
+
+
+def automation_mode(receipt):
+    """Read the preference from the exact managed block, including legacy receipts."""
+    content = decoded(receipt.get('block')) if receipt else b''
+    if not content:
+        return 'disabled'
+    if AUTOMATIC.encode() in content:
+        return 'automatic'
+    if MANUAL.encode() in content:
+        return 'manual'
+    return 'policy'
+
+
+def desired_mode(receipt, requested):
+    previous = automation_mode(receipt)
+    return requested or (previous if previous != 'disabled' else 'policy')
 
 
 def encoded(data):
@@ -149,7 +189,7 @@ def shared_skill(target):
         raise Conflict('Shared SKILL.md metadata name must be model-switcher')
 
 
-def activation_change(command, skills_dir, codex_home):
+def activation_change(command, skills_dir, codex_home, requested_mode=None):
     """Manage one extra profile's instructions; never mutate the shared skill."""
     target = safe(safe(skills_dir) / 'model-switcher')
     state = safe(safe(codex_home) / 'model-switcher-install')
@@ -177,12 +217,15 @@ def activation_change(command, skills_dir, codex_home):
             shared_skill(target)
         return {'status': 'activation-only' if receipt else 'absent', 'target': str(target),
                 'global_activation': bool(receipt), 'shared_skill_available': available,
-                'manages_shared_skill': False, 'rollback_available': False}
+                'manages_shared_skill': False, 'rollback_available': False,
+                'automation_mode': automation_mode(receipt)}
     if command == 'activate':
         shared_skill(target)
-        new_block = block(target)
+        mode = desired_mode(receipt, requested_mode)
+        new_block = block(target, mode)
         if receipt and decoded(receipt['block']) == new_block:
-            return {'status': 'unchanged', 'mode': 'activation-only', 'target': str(target)}
+            return {'status': 'unchanged', 'mode': 'activation-only', 'target': str(target),
+                    'automation_mode': mode}
         original_global_existed = agents.exists()
         dump(pending, {'operation': 'activate', 'agents': str(agents), 'target': str(target)})
         atomic(agents, remainder + new_block)
@@ -190,7 +233,8 @@ def activation_change(command, skills_dir, codex_home):
                            'agents': str(agents), 'block': encoded(new_block),
                            'original_global_existed': receipt['original_global_existed'] if receipt else original_global_existed})
         pending.unlink()
-        return {'status': 'activated', 'mode': 'activation-only', 'target': str(target)}
+        return {'status': 'activated', 'mode': 'activation-only', 'target': str(target),
+                'automation_mode': mode}
     if not receipt:
         return {'status': 'absent'}
     dump(pending, {'operation': 'deactivate', 'agents': str(agents)})
@@ -215,7 +259,7 @@ def copy_files(source, destination, hashes):
         out.write_bytes(data)
 
 
-def install(source, skills_dir, codex_home, activation=True):
+def install(source, skills_dir, codex_home, activation=True, requested_mode=None):
     source = safe(source)
     files = digest_tree(source)
     if 'SKILL.md' not in files:
@@ -224,12 +268,13 @@ def install(source, skills_dir, codex_home, activation=True):
     if source == target or target in source.parents or source in target.parents:
         raise Conflict('Source and target must be separate trees')
     global_existed = agents.exists()
-    new_block = block(target) if activation else b''
+    mode = desired_mode(receipt, requested_mode) if activation else 'disabled'
+    new_block = block(target, mode) if activation else b''
     old_owned = receipt.get('block') if receipt else None
     remainder = global_without(current, old_owned)
     new_global = remainder + new_block
     if receipt and files == receipt['files'] and encoded(new_block) == receipt.get('block'):
-        return {'status': 'unchanged', 'target': str(target)}
+        return {'status': 'unchanged', 'target': str(target), 'automation_mode': mode}
     state.mkdir(parents=True, exist_ok=True)
     os.chmod(state, 0o700)
     dump(state / 'pending.json', {'operation': 'install', 'target': str(target), 'agents': str(agents)})
@@ -260,7 +305,8 @@ def install(source, skills_dir, codex_home, activation=True):
                    'original_global_existed': receipt['original_global_existed'] if receipt else global_existed}
     dump(state / 'receipt.json', new_receipt)
     (state / 'pending.json').unlink()
-    return {'status': 'installed', 'target': str(target), 'global_activation': activation}
+    return {'status': 'installed', 'target': str(target), 'global_activation': activation,
+            'automation_mode': mode}
 
 
 def change(command, skills_dir, codex_home):
@@ -268,7 +314,8 @@ def change(command, skills_dir, codex_home):
     if command == 'status':
         return {'status': 'installed' if receipt else 'absent', 'target': str(target),
                 'global_activation': bool(receipt and decoded(receipt.get('block'))),
-                'rollback_available': (state / 'prior' / 'receipt.json').exists()}
+                'rollback_available': (state / 'prior' / 'receipt.json').exists(),
+                'automation_mode': automation_mode(receipt)}
     if not receipt:
         return {'status': 'absent'}
     remainder = global_without(current, receipt.get('block'))
@@ -301,7 +348,8 @@ def change(command, skills_dir, codex_home):
         if (state / 'prior').exists():
             shutil.rmtree(state / 'prior')
     (state / 'pending.json').unlink()
-    return {'status': 'rolled-back' if old else 'uninstalled'}
+    return {'status': 'rolled-back' if old else 'uninstalled',
+            'automation_mode': automation_mode(old)}
 
 
 def main(argv=None):
@@ -310,8 +358,19 @@ def main(argv=None):
     p.add_argument('--skills-dir', type=Path, default=Path.home() / '.agents/skills')
     p.add_argument('--codex-home', type=Path, default=Path(os.environ.get('CODEX_HOME', str(Path.home() / '.codex'))))
     p.add_argument('--no-global', action='store_true', help='Install discovery only; omit global activation instructions')
+    modes = p.add_mutually_exclusive_group()
+    modes.add_argument('--automatic', dest='automation_mode', action='store_const', const='automatic',
+                       help='Save standing automatic model/effort switching and checkpoint-resume preference for this profile')
+    modes.add_argument('--manual', dest='automation_mode', action='store_const', const='manual',
+                       help='Disable automatic switching and continuation for this profile')
     a = p.parse_args(argv)
     try:
+        if a.automation_mode and a.command not in ('install', 'activate'):
+            raise Conflict('--automatic/--manual apply only to install or activate')
+        if a.no_global and a.command != 'install':
+            raise Conflict('--no-global applies only to install')
+        if a.no_global and a.automation_mode:
+            raise Conflict('--automatic/--manual require global instructions; omit --no-global')
         state = safe(a.codex_home / 'model-switcher-install')
         state.mkdir(parents=True, exist_ok=True)
         os.chmod(state, 0o700)
@@ -320,9 +379,10 @@ def main(argv=None):
         os.close(fd)
         try:
             if a.command in ('activate', 'deactivate') or (a.command == 'status' and safe(state / 'activation.json').exists()):
-                result = activation_change(a.command, a.skills_dir, a.codex_home)
+                result = activation_change(a.command, a.skills_dir, a.codex_home, a.automation_mode)
             elif a.command == 'install':
-                result = install(Path(__file__).resolve().parents[1], a.skills_dir, a.codex_home, not a.no_global)
+                result = install(Path(__file__).resolve().parents[1], a.skills_dir, a.codex_home,
+                                 not a.no_global, a.automation_mode)
             else:
                 result = change(a.command, a.skills_dir, a.codex_home)
         finally:

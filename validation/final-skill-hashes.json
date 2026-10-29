@@ -1,14 +1,16 @@
 {
   "LICENSE": "747b45fb70bbc46628a8a6b642f3c1283899f54b16f83398b527d96492d364ae",
-  "README.md": "2c91113f24e3c263417e3b16f219e6751363a4fa93de6db5d83ec9ae0894e4c2",
-  "SKILL.md": "fa90bd03ffb084335b94b4101267134928f2de1165d83e8edf5df469bf05b8f5",
-  "agents/openai.yaml": "7893916feac3d59054ec7ae02243c0d37e098ae7435f770c431882221f17b3e4",
-  "references/active-chat.md": "49107952609b00e10dde48177d6502f306e134081d40d00137cd987b9f67f226",
-  "references/capabilities.md": "7e72e6d4ce5ac3292e4684b893fb6987b29bdd0b8f3cb053477b312d89388b8f",
-  "references/examples.md": "a912c071d4328a3e236aecbbef500b777876dc74c8c575cf2538c796148ae3c3",
-  "references/host.md": "af79561fc9b3e6e253b3875a45454cbb76c93f1395e0bb3cbce04b3fff99c72c",
-  "references/runtime.md": "a6a5180dfcdf9a68a109e97caa84da69a5878fbd85c6919f23d2dab2edefbe9f",
-  "scripts/active_chat.py": "d9bec8c497aa3423451338c5c5785f410548894396c4d613ecbf217e0218f4f8",
-  "scripts/install.py": "0ab3bbc4d98c009e0a5436e6358804bf41134100fec99b4303ccfdeb4041ea5c",
-  "templates/handoff.md": "be07cff096b17ce6cdcbc719d4d753754ec7a4c3e5f024275aefe6736c939856"
+  "README.md": "952b9ec11a6db1ae3acce7825a3cc0024ec096fcb13d3953b684cd60cbad9f9a",
+  "SKILL.md": "2ca0b1d733b758459bf3617f7a42ec596980d90261280365189567f3d4948ac9",
+  "agents/openai.yaml": "530fed9206ef33c6a1cf62b385f21dc53edf730312b93650dbcab67ac5cb3981",
+  "references/active-chat.md": "567d1e53ea0390bc6dc3318823526da503431bf2bf66f414ebfeedd2cc18ea59",
+  "references/capabilities.md": "53fe895819492077611c4a69fb1dfb7be2e7033dc583d6f60197d3876ad4999b",
+  "references/continuation.md": "620d86d901ecd7d9deba27c00a213405b2ddb7382404d1ff1ac9d9478304db4b",
+  "references/examples.md": "0e6df8a005b9e588a1942e065d506aca9f740dbf36f7f6d1793e2d88993d0726",
+  "references/host.md": "a1e001eb67f729f31c369131fc90478bf055c388167576efe916a6027601006f",
+  "references/runtime.md": "eff50b087a62544d27f5bbabd1c63e2ef80f86e69f9083944a856074f1b0081f",
+  "scripts/active_chat.py": "4e8f9d779287e5a7902826e0137cf593ab18838eb968c7374934ec7306213495",
+  "scripts/continuation.py": "c49bb793a2e8871f4843fe67d0c38214a2e7d63fb3a579ec27188a4b51b0edeb",
+  "scripts/install.py": "f2521047ae49b52abf6728a8b919b21d53b5c99b0bfa0041550727b0c3bb2145",
+  "templates/handoff.md": "ccff497f3cba3908ad4b6e4cf1661351e55c1aa2e619b63d91d4963d3151b33c"
 }

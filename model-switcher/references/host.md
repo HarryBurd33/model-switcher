@@ -19,7 +19,10 @@ selection for subsequent turns. Use the [guarded native procedure](active-chat.m
 Do not guess thread IDs or call another session to change this one. This does not prove
 mid-turn inference switching. Default edits do not retroactively change the active chat.
 
-When the native route or verification is unavailable, use manual desktop transition:
+With continuation authority from the current user or loaded standing global automatic
+preference, and verified scheduling, use the
+[continuation procedure](continuation.md). Otherwise, when automatic continuation or
+its verification is unavailable, use manual desktop transition:
 
 1. Choose an exact model and effort from the current catalog/picker and record why.
 2. Save/verify the complete task-checkpoint bundle, jobs and artifacts; release the lease

@@ -118,8 +118,8 @@ class InstallerTests(unittest.TestCase):
         self.run_install('uninstall', expected=2)
         self.assertTrue((self.target / 'private.txt').exists())
 
-    def secondary(self, command, expected=0):
-        return self.run_install(command, '--codex-home', str(self.root / 'second'), expected=expected)
+    def secondary(self, command, *extra, expected=0):
+        return self.run_install(command, '--codex-home', str(self.root / 'second'), *extra, expected=expected)
 
     def test_shared_profile_activation_status_and_text_preservation(self):
         self.run_install()
@@ -199,6 +199,97 @@ class InstallerTests(unittest.TestCase):
         (state / 'receipt.json').unlink()
         (state / 'pending.json').write_text('{}')
         self.secondary('activate', expected=2); self.secondary('deactivate', expected=2)
+
+
+    def test_fresh_default_is_policy_without_standing_automatic_authority(self):
+        result = self.run_install()
+        self.assertEqual(result['automation_mode'], 'policy')
+        self.assertEqual(self.run_install('status')['automation_mode'], 'policy')
+        self.assertNotIn('standing preference', self.global_file.read_text())
+        self.assertNotIn('one-use continuation', self.global_file.read_text())
+        self.run_install('install', '--no-global')
+        self.assertEqual(self.run_install('status')['automation_mode'], 'disabled')
+
+    def test_automatic_preference_contains_transition_contract_and_preserves_on_upgrade(self):
+        self.global_file.write_text('User rules\n')
+        self.assertEqual(self.run_install('install', '--automatic')['automation_mode'], 'automatic')
+        block = self.global_file.read_text()
+        for phrase in ('models AND reasoning effort', 'checkpoint or handoff first',
+                       'verify readback', 'one-use continuation', 'concrete reason',
+                       'Explicit model choices', 'paid API spending', 'mid-turn'):
+            self.assertIn(phrase, block)
+        self.assertEqual(self.run_install()['status'], 'unchanged')
+        (self.source / 'SKILL.md').write_text('---\nname: model-switcher\n---\nUpdated content\n')
+        self.assertEqual(self.run_install()['automation_mode'], 'automatic')
+        self.assertEqual(self.global_file.read_text(), block)
+        self.assertEqual(self.run_install('status')['automation_mode'], 'automatic')
+        self.assertEqual(set(p.name for p in self.home.iterdir()), {'AGENTS.md', 'model-switcher-install'})
+        self.assertFalse(any(p.name == 'automations' for p in self.home.rglob('*')))
+
+    def test_manual_downgrade_persists_and_rollback_restores_automatic(self):
+        self.run_install('install', '--automatic')
+        original = self.global_file.read_bytes()
+        self.assertEqual(self.run_install('install', '--manual')['automation_mode'], 'manual')
+        self.assertIn('Keep automatic switching and automatic continuation disabled', self.global_file.read_text())
+        self.assertNotIn('standing preference', self.global_file.read_text())
+        self.assertEqual(self.run_install()['status'], 'unchanged')
+        self.assertEqual(self.run_install('status')['automation_mode'], 'manual')
+        self.assertEqual(self.run_install('rollback')['automation_mode'], 'automatic')
+        self.assertEqual(self.global_file.read_bytes(), original)
+
+    def test_legacy_primary_receipt_upgrades_without_new_authority_and_rolls_back(self):
+        self.run_install()
+        receipt = json.loads((self.home / 'model-switcher-install/receipt.json').read_text())
+        self.assertEqual(set(receipt), {'version', 'target', 'agents', 'files', 'block', 'original_global_existed'})
+        original = self.global_file.read_bytes()
+        self.run_install('install', '--automatic')
+        self.assertEqual(self.run_install('rollback')['automation_mode'], 'policy')
+        self.assertEqual(self.global_file.read_bytes(), original)
+
+    def test_secondary_automatic_preference_is_explicit_and_independent(self):
+        self.run_install('install', '--automatic')
+        primary = self.global_file.read_bytes()
+        shared = {p.relative_to(self.target): p.read_bytes() for p in self.target.rglob('*') if p.is_file()}
+        self.assertEqual(self.secondary('activate')['automation_mode'], 'policy')
+        self.assertEqual(self.secondary('activate', '--automatic')['automation_mode'], 'automatic')
+        agents = self.root / 'second/AGENTS.md'
+        automatic = agents.read_bytes()
+        self.assertEqual(self.secondary('activate')['status'], 'unchanged')
+        self.assertEqual(agents.read_bytes(), automatic)
+        self.assertEqual(self.secondary('status')['automation_mode'], 'automatic')
+        self.assertEqual(self.secondary('activate', '--manual')['automation_mode'], 'manual')
+        self.assertEqual(self.secondary('activate')['automation_mode'], 'manual')
+        self.assertEqual(self.global_file.read_bytes(), primary)
+        self.assertEqual({p.relative_to(self.target): p.read_bytes() for p in self.target.rglob('*') if p.is_file()}, shared)
+        self.secondary('deactivate')
+        self.assertEqual(self.secondary('activate')['automation_mode'], 'policy')
+
+    def test_automatic_mode_still_refuses_changed_activation_and_shared_files(self):
+        self.run_install('install', '--automatic')
+        self.global_file.write_text(self.global_file.read_text().replace('concrete reason', 'my custom reason'))
+        before = self.global_file.read_bytes()
+        self.run_install('install', '--manual', expected=2)
+        self.assertEqual(self.global_file.read_bytes(), before)
+
+    def test_mode_flags_on_wrong_commands_reject_before_creating_profile_state(self):
+        for command, flags in [('status', ['--automatic']), ('rollback', ['--manual']),
+                               ('uninstall', ['--automatic']), ('deactivate', ['--manual']),
+                               ('install', ['--automatic', '--no-global']),
+                               ('install', ['--manual', '--no-global']),
+                               ('activate', ['--no-global'])]:
+            with self.subTest(command=command, flags=flags):
+                self.run_install(command, *flags, expected=2)
+                self.assertFalse((self.home / 'model-switcher-install').exists())
+                self.assertFalse(self.target.exists())
+                self.assertFalse(self.global_file.exists())
+
+    def test_mode_flags_are_mutually_exclusive_without_side_effects(self):
+        result = subprocess.run([sys.executable, str(self.source / 'scripts/install.py'), 'install',
+                                 '--skills-dir', str(self.skills), '--codex-home', str(self.home),
+                                 '--automatic', '--manual'], text=True, capture_output=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse((self.home / 'model-switcher-install').exists())
+        self.assertFalse(self.target.exists())
 
 
 if __name__ == '__main__':

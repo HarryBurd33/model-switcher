@@ -6,6 +6,11 @@ catalog and resource fields are fresh operator attestations, not recovered permi
 The caller owns checkpointing, the task lease and durable intent/outcome recording.
 """
 import argparse
+import base64
+import hashlib
+import hmac
+import os
+import struct
 import datetime as dt
 import json
 from pathlib import Path
@@ -111,7 +116,9 @@ def verify(request, readback, now=None):
     for label, value in expected.items():
         token(value, label)
     require(isinstance(readback, dict)
-            and readback.get('source') == 'codex-app-server-thread-read',
+            and readback.get('source') == 'codex-app-server-thread-read'
+            and readback.get('transport') == 'existing-server-proxy-websocket'
+            and readback.get('server_start_attempted') is False,
             'Trusted host readback source is required')
     fresh(readback.get('observed_at'), now or dt.datetime.now(dt.timezone.utc))
     thread = object_field(readback, 'thread')
@@ -125,68 +132,250 @@ def verify(request, readback, now=None):
             'Thread loading state is unknown')
     return {'selection_confirmed': True, 'execution_confirmed': False,
             'claim_scope': 'configured_for_subsequent_turns',
+            'transport': 'existing-server-proxy-websocket',
+            'server_start_attempted': False,
             'metadata_scope': 'latest_persisted' if kind == 'notLoaded' else 'current_configured',
             'expected': expected}
 
 
+HEADER_LIMIT = 8192
+FRAME_LIMIT = 1024 * 1024
+WIRE_LIMIT = 4 * FRAME_LIMIT
+MESSAGE_LIMIT = 64
+WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
+
+
+class ProxyChannel:
+    """Bounded binary pipe IO; no server spawn, retry or arbitrary RPC dispatch."""
+    def __init__(self, process, deadline):
+        self.process, self.deadline = process, deadline
+        self.buffer = bytearray()
+        self.items = queue.Queue(maxsize=16)
+        self.stopped = threading.Event()
+        self.workers = []
+        reader = threading.Thread(target=self._receive, daemon=True)
+        reader.start()
+        self.workers.append(reader)
+
+    def remaining(self):
+        remaining = self.deadline - time.monotonic()
+        require(remaining > 0, 'Existing-server metadata probe timed out')
+        return remaining
+
+    def _put(self, value):
+        while not self.stopped.is_set():
+            try:
+                self.items.put(value, timeout=.05)
+                return
+            except queue.Full:
+                pass
+
+    def _receive(self):
+        total = 0
+        try:
+            while not self.stopped.is_set():
+                chunk = self.process.stdout.read(4096)
+                if not chunk:
+                    self._put(None)
+                    return
+                total += len(chunk)
+                if total > WIRE_LIMIT:
+                    self._put(GuardError('Existing-server proxy output exceeds bound'))
+                    return
+                self._put(chunk)
+        except (OSError, ValueError):
+            self._put(GuardError('Existing-server proxy input unavailable'))
+
+    def _next(self):
+        try:
+            value = self.items.get(timeout=self.remaining())
+        except queue.Empty:
+            raise GuardError('Existing-server metadata probe timed out')
+        if isinstance(value, GuardError):
+            raise value
+        require(value is not None, 'Existing-server proxy exited before reply; no fallback')
+        require(isinstance(value, bytes), 'Proxy must provide binary WebSocket data')
+        self.buffer.extend(value)
+
+    def read_exact(self, count):
+        require(0 <= count <= FRAME_LIMIT, 'WebSocket frame exceeds bound')
+        while len(self.buffer) < count:
+            self._next()
+        self.remaining()
+        value = bytes(self.buffer[:count]); del self.buffer[:count]
+        return value
+
+    def read_headers(self):
+        while True:
+            end = self.buffer.find(b'\r\n\r\n')
+            if end >= 0:
+                require(end + 4 <= HEADER_LIMIT, 'WebSocket headers exceed bound')
+                value = bytes(self.buffer[:end]); del self.buffer[:end+4]
+                return value
+            require(len(self.buffer) <= HEADER_LIMIT, 'WebSocket headers exceed bound')
+            self._next()
+
+    def write(self, data):
+        require(len(data) <= HEADER_LIMIT, 'Fixed metadata request exceeds bound')
+        result = queue.Queue(maxsize=1)
+        def send():
+            try:
+                view = memoryview(data)
+                while view:
+                    if self.stopped.is_set():
+                        raise GuardError('Existing-server proxy stopped')
+                    self.remaining()
+                    size = self.process.stdin.write(view)
+                    require(isinstance(size, int) and 0 < size <= len(view), 'Proxy write made no progress')
+                    view = view[size:]
+                self.process.stdin.flush()
+                result.put(None)
+            except (OSError, ValueError) as error:
+                result.put(error)
+        worker = threading.Thread(target=send, daemon=True)
+        worker.start(); self.workers.append(worker)
+        try:
+            error = result.get(timeout=self.remaining())
+        except queue.Empty:
+            raise GuardError('Existing-server proxy write timed out')
+        require(error is None, 'Existing-server proxy write unavailable; no fallback')
+
+
+def websocket_upgrade(channel):
+    key = base64.b64encode(os.urandom(16)).decode('ascii')
+    request = ('GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: websocket\r\n'
+               'Connection: Upgrade\r\nSec-WebSocket-Version: 13\r\n'
+               'Sec-WebSocket-Key: ' + key + '\r\n\r\n')
+    channel.write(request.encode('ascii'))
+    try:
+        lines = channel.read_headers().decode('ascii').split('\r\n')
+    except UnicodeError:
+        raise GuardError('Invalid WebSocket upgrade headers')
+    require(lines[0].split(' ', 2)[:2] == ['HTTP/1.1', '101'], 'Existing server refused WebSocket upgrade')
+    headers = {}
+    for line in lines[1:]:
+        require(':' in line and not line.startswith((' ', '\t')), 'Malformed WebSocket header')
+        name, value = line.split(':', 1); name = name.lower()
+        require(re.fullmatch(r"[!#$%&'*+.^_`|~0-9a-z-]+", name) and name not in headers,
+                'Invalid or duplicate WebSocket header')
+        headers[name] = value.strip()
+    expected = base64.b64encode(hashlib.sha1((key + WS_GUID).encode('ascii')).digest()).decode('ascii')
+    require(headers.get('upgrade', '').lower() == 'websocket'
+            and 'upgrade' in [x.strip().lower() for x in headers.get('connection', '').split(',')]
+            and hmac.compare_digest(headers.get('sec-websocket-accept', ''), expected),
+            'WebSocket upgrade validation failed')
+    require('sec-websocket-extensions' not in headers and 'sec-websocket-protocol' not in headers,
+            'Unrequested WebSocket extension or subprotocol')
+
+
+def websocket_send(channel, payload, opcode=1):
+    require(opcode in (1, 10) and len(payload) <= HEADER_LIMIT - 14, 'Invalid outgoing metadata frame')
+    mask = os.urandom(4); size = len(payload)
+    prefix = bytes([0x80 | opcode, 0x80 | size]) if size < 126 else bytes([0x80 | opcode, 0xfe]) + struct.pack('!H', size)
+    channel.write(prefix + mask + bytes(value ^ mask[i % 4] for i, value in enumerate(payload)))
+
+
+def websocket_receive(channel):
+    first, second = channel.read_exact(2)
+    require(first & 0x80 and not first & 0x70, 'Fragmented or extended WebSocket frames unsupported')
+    require(not second & 0x80, 'Server WebSocket frame must not be masked')
+    opcode, size = first & 0x0f, second & 0x7f
+    require(opcode in (1, 8, 9, 10), 'Unsupported WebSocket frame opcode')
+    if size == 126:
+        size = struct.unpack('!H', channel.read_exact(2))[0]
+        require(size >= 126, 'Noncanonical WebSocket length')
+    elif size == 127:
+        size = struct.unpack('!Q', channel.read_exact(8))[0]
+        require(65536 <= size < 2**63, 'Noncanonical WebSocket length')
+    require(size <= FRAME_LIMIT and (opcode == 1 or size <= 125), 'WebSocket frame exceeds bound')
+    payload = channel.read_exact(size)
+    if opcode == 8:
+        raise GuardError('Existing-server WebSocket closed before reply')
+    if opcode == 9:
+        websocket_send(channel, payload, opcode=10)
+        return None
+    if opcode == 10:
+        return None
+    try:
+        value = json.loads(payload.decode('utf-8'))
+    except (UnicodeError, ValueError):
+        raise GuardError('Invalid WebSocket metadata JSON')
+    require(isinstance(value, dict), 'Metadata message must be an object')
+    return value
+
+
 def inspect_selection(chat_id, executable='codex', timeout=20):
-    """Use only initialize + thread/read on a separate read-only app-server connection."""
+    """Attach to the existing server through proxy WebSocket pipes; never auto-start.
+
+    Only initialize, initialized and thread/read are sent. Unsupported framing,
+    absence or uncertainty blocks. Deadlines bound userspace waits and cleanup;
+    uninterruptible OS operations are not a hard real-time guarantee.
+    """
     token(chat_id, 'chat id')
     require(isinstance(timeout, (int, float)) and not isinstance(timeout, bool)
             and 1 <= timeout <= 60, 'Probe timeout must be 1–60 seconds')
-    process = subprocess.Popen([executable, 'app-server', '--stdio'], stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
-    messages = queue.Queue()
-    def receive():
-        try:
-            for line in process.stdout:
-                try:
-                    messages.put(json.loads(line))
-                except ValueError:
-                    continue
-        except (OSError, ValueError):
-            pass
-        finally:
-            messages.put(None)
-    threading.Thread(target=receive, daemon=True).start()
     deadline = time.monotonic() + timeout
+    work_deadline = deadline - min(2, timeout / 2)
+    process = subprocess.Popen([executable, 'app-server', 'proxy'], stdin=subprocess.PIPE,
+                               stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0)
+    channel = None
+    messages_seen = 0
     def send(message):
-        process.stdin.write(json.dumps(message) + '\n')
-        process.stdin.flush()
+        websocket_send(channel, json.dumps(message, separators=(',', ':')).encode('utf-8'))
     def request(ident, method, params):
+        nonlocal messages_seen
         send({'id': ident, 'method': method, 'params': params})
-        while time.monotonic() < deadline:
-            try:
-                value = messages.get(timeout=max(.01, deadline - time.monotonic()))
-            except queue.Empty:
-                break
-            require(value is not None, 'Read-only metadata probe exited before reply')
+        while True:
+            channel.remaining()
+            messages_seen += 1
+            require(messages_seen <= MESSAGE_LIMIT, 'Metadata message count exceeds bound')
+            value = websocket_receive(channel)
+            if value is None:
+                continue
+            require(not ('method' in value and 'id' in value), 'Unexpected server request')
             if value.get('id') == ident:
                 require('error' not in value and isinstance(value.get('result'), dict),
-                        'Read-only metadata method unavailable')
+                        'Existing-server metadata method unavailable')
                 return value['result']
-        raise GuardError('Read-only metadata probe timed out')
     try:
+        channel = ProxyChannel(process, work_deadline)
+        websocket_upgrade(channel)
         request(1, 'initialize', {'clientInfo': {'name': 'model_switcher_selection_probe',
-                                               'version': '0.2.0'}})
+                                               'version': '0.3.1'}})
         send({'method': 'initialized', 'params': {}})
         data = request(2, 'thread/read', {'threadId': chat_id, 'includeTurns': False})
         thread = object_field(data, 'thread')
         require(thread.get('id') == chat_id, 'Probe returned another chat')
         return {'source': 'codex-app-server-thread-read',
+                'transport': 'existing-server-proxy-websocket', 'server_start_attempted': False,
                 'observed_at': dt.datetime.now(dt.timezone.utc).isoformat(),
                 'thread': {key: thread.get(key) for key in
                            ('id', 'model', 'reasoningEffort', 'modelProvider', 'status')}}
     finally:
-        if process.poll() is None:
-            process.terminate()
+        if channel is not None:
+            channel.stopped.set()
         try:
-            process.wait(timeout=3)
+            if process.poll() is None:
+                try:
+                    process.terminate()
+                except ProcessLookupError:
+                    pass
+            process.wait(timeout=max(0, min(1, (deadline - time.monotonic()) / 2)))
         except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait(timeout=3)
-        process.stdin.close()
-        process.stdout.close()
+            try:
+                process.kill()
+            except ProcessLookupError:
+                pass
+            try:
+                process.wait(timeout=max(0, deadline - time.monotonic()))
+            except subprocess.TimeoutExpired:
+                raise GuardError('Existing-server proxy cleanup outcome unknown')
+        finally:
+            process.stdin.close(); process.stdout.close()
+            for worker in channel.workers if channel is not None else []:
+                worker.join(timeout=max(0, deadline - time.monotonic()))
+        require(channel is None or not any(worker.is_alive() for worker in channel.workers),
+                'Existing-server proxy IO cleanup outcome unknown')
 
 
 def read_json(path):

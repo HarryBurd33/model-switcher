@@ -12,7 +12,9 @@ Build observations apply to this Mac and installed Codex CLI 0.164.0, not every 
 | Lifecycle | Instruction calls at meaningful phases; existing task-checkpoint hooks remain independent |
 | Automatic selected-model worker | Existing task-checkpoint qualified adapters; no new adapter here |
 | Native active-chat selection | Verified app-tool overrides plus host readback in the same active chat; subsequent turns only |
-| Mid-turn inference / automatic continuation | Not established; current turn can receive a steering cue without starting a new turn |
+| Mid-turn inference | Not supported by this route; current turn can receive a configuration cue |
+| Automatic continuation | Authorized guarded heartbeat procedure; a loaded standing global preference can cover its chats; offline guards and live new-turn behavior are separate evidence |
+| Automatic default and notices | `install/activate --automatic` saves profile-specific model/effort selection plus checkpoint-bound continuation preference; each actual change briefly names the target and reason; no setup schedule |
 | Effective desktop model/effort | Unknown unless trusted current-thread evidence exposes it; defaults alone insufficient |
 | Model availability/efforts | Live `model/list`, account-specific; recheck before launch |
 | Qualification | Exact model/effort/class/tools/privacy; existing narrow text evidence does not qualify coding |
@@ -58,3 +60,18 @@ only the profile’s global instruction block.
 Version 0.2.0 independently checks configured/latest-persisted model readback; those fields
 are not per-turn inference telemetry. Native messaging permission is scoped to the current
 human-authorized chat; guards do not create permission from saved task data.
+
+Version 0.3.0 adds one-use continuation guards in the existing checkpoint store. The
+installer does not create schedules. Native use needs explicit current scope, confirmed
+selection and a later turn, retained ownership, fresh stops/resources and scheduler
+retirement. Duplicate suppression is cooperative/at-most-once, not guaranteed delivery.
+
+Version 0.3.1 replaces the new-server metadata probe with the supported existing-daemon
+proxy and bounded WebSocket transport. A running daemon is a prerequisite, not something
+the skill starts. Missing native readback leaves automatic continuation unarmed.
+
+Version 0.4.0 accepts a user's explicit standing global instruction instead of requiring
+repeated per-chat opt-in. Model-only and effort-only changes share the verified handoff
+and one-use receiving procedure. Upgrades preserve mode; explicit choices/stops win.
+Global installation/loaded instructions cannot guarantee invocation in every existing
+chat or provide missing native tools. See the release validation for actual checks.

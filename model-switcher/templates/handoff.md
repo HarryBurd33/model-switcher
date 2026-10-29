@@ -10,10 +10,18 @@
 - Routing policy: strongest suitable planning, qualified economical bounded work, quality first;
   existing reserves/stops; no paid fallback; attempts/time/API spending boundary:
 - Exact currently available recommended model and supported effort, required tools and reason:
+- Selection mode and live authority source (task/chat instruction or standing global preference):
+- Transition receipt: proposed / selected and verified / resume scheduled / receiving turn observed:
 - Next bounded action and verification:
 - Verified checkpoint bundle and HANDOFF.md locations (or explicitly unsaved emergency copy):
 - Ownership authority, current holder and safe release status:
 - Supported switching steps and required user action:
+
+For automatic transitions, fill the receiving prompt below with the exact task, paths,
+model/effort, next action and acceptance check. Deliver it through the guarded one-use
+continuation procedure; do not recursively send it as steering in the active turn.
+Briefly tell the user the selection and reason, and whether resume is scheduled or
+observed. This applies equally to model-only, effort-only and combined changes.
 
 Copyable resume instruction (replace all placeholders before delivery):
 

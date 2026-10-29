@@ -1,6 +1,6 @@
 interface:
   display_name: "Model Switcher"
   short_description: "Route substantial work with verified quality and resource limits"
-  default_prompt: "Use $model-switcher to plan suitable model and reasoning assignments, then complete this task within its acceptance criteria and authorized resource limits."
+  default_prompt: "Use $model-switcher to complete this task with suitable models and reasoning effort. Honor my loaded automatic preference, briefly explain justified switches, and resume through a verified checkpoint within current acceptance criteria and resource limits."
 policy:
   allow_implicit_invocation: true

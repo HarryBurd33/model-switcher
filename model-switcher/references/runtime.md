@@ -1,9 +1,17 @@
 # Existing runtime contract
 
-Dependency: installed `task-checkpoint` 0.5.0 with Python 3.9+ and Git. Discover it through
+Dependency: a compatible installed `task-checkpoint` with Python 3.9+ and Git.
+The original routing integration inspected 0.5.0; the automatic-continuation update
+uses the existing local checkpoint/ownership contract from installed 0.5.1. Discover it through
 the host's skill catalog; its typical user-level path is
 `~/.agents/skills/task-checkpoint/SKILL.md`. Read its current operator/router instructions
 and actual templates. This companion contains no replacement runtime or queue.
+
+The 0.4.0 update also inspected installed task-checkpoint 0.8.0 for ordinary saves and
+ownership. Its current resume accepts direct user authority without a review file; use
+the installed version's commands rather than imposing the older worker review workflow
+on a native same-chat transition. The optional worker adapter below remains a historical
+0.5 integration and is not certified as a complete 0.8 worker runtime.
 
 Inspect existing stores, queues and bindings before setup. If no binding exists, make a
 single task binding through that runtime only when authorized. Unrelated tasks need

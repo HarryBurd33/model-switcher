@@ -11,11 +11,11 @@ SKILL_FILES = [
     'SKILL.md', 'README.md', 'LICENSE', 'agents/openai.yaml',
     'references/capabilities.md', 'references/examples.md', 'references/host.md',
     'references/runtime.md', 'references/active-chat.md', 'scripts/install.py',
-    'scripts/active_chat.py', 'templates/handoff.md',
+    'scripts/active_chat.py', 'scripts/continuation.py', 'references/continuation.md', 'templates/handoff.md',
 ]
 PUBLIC_FILES = [
     'README.md', 'LICENSE', '.gitignore', '.github/workflows/ci.yml',
-    'scripts/build_release.py', 'tests/test_install.py', 'tests/test_release.py', 'tests/test_active_chat.py',
+    'scripts/build_release.py', 'tests/test_install.py', 'tests/test_release.py', 'tests/test_active_chat.py', 'tests/test_continuation.py',
     'validation/REPORT.md', 'validation/cases.json', 'validation/evaluator.json',
     'validation/model-grades.md', 'validation/model-grades-v2.md',
     'validation/live-observations.json', 'validation/dependency-hashes.json',
@@ -24,6 +24,7 @@ PUBLIC_FILES = [
     'validation/candidate-v2-suite.json', 'validation/native-checks.json',
     'validation/manual-real-check.json', 'validation/manual-real-review.md',
     'validation/active-chat-check.json', 'validation/active-chat-review.md',
+    'validation/global-defaults-check.json', 'validation/global-defaults-review.md',
 ]
 
 
@@ -99,7 +100,7 @@ def export(root, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=Path('dist/model-switcher-0.2.0.zip'))
+    parser.add_argument('--output', type=Path, default=Path('dist/model-switcher-0.4.0.zip'))
     parser.add_argument('--export-dir', type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]

@@ -1,0 +1,68 @@
+{
+  "version": "0.4.0",
+  "date": "2026-10-29",
+  "scope": "Explicit standing global automatic model/effort preference plus checkpoint-bound same-chat continuation",
+  "tests": {
+    "count": 80,
+    "result": "passed",
+    "kind": "executed local unit/integration fixtures",
+    "new_installer_cases": 8
+  },
+  "baseline": {
+    "commit": "844567dc81d861b6c622ee48d1ffd8150ff07247",
+    "global_preference": "routing policy only; per-chat automatic opt-in required",
+    "comparison": "Independent committed-source before/after installer comparison passed"
+  },
+  "candidate": {
+    "global_mode": "explicit --automatic per profile; no-flag upgrades preserve mode",
+    "notices": "model/effort and concrete reason; distinguish proposed, selected, scheduled, resumed",
+    "scope_guards": "current human profile/task source; explicit choices, stops and permissions control",
+    "effort_only_changes": "same verified handoff/selection/continuation procedure"
+  },
+  "native": {
+    "read_only_existing_server_probe": "passed",
+    "configured_selection_observed": {
+      "model": "gpt-6.1-sol",
+      "effort": "high"
+    },
+    "new_server_started": false,
+    "execution_model_confirmed": false,
+    "continuation": {
+      "result": "observed",
+      "origin_completed": true,
+      "distinct_receiver_turn": true,
+      "single_claim": true,
+      "scheduler_deleted_before_work": true,
+      "execution_model_confirmed": false
+    }
+  },
+  "installation": {
+    "version": "0.4.0",
+    "installed_files_match": 14,
+    "profiles": [
+      {
+        "profile_role": "primary",
+        "automatic_block_verified": true,
+        "unrelated_text_preserved_by_managed_update": true
+      },
+      {
+        "profile_role": "secondary-activation-only",
+        "automatic_block_verified": true,
+        "unrelated_text_preserved_by_managed_update": true
+      }
+    ],
+    "mode": "automatic",
+    "primary_global_instruction_delivered_in_current_chat": true,
+    "setup_schedules_created": 0
+  },
+  "publication": "Release verification receipts retained privately after publication",
+  "independent_review": {
+    "blocking_defects": 0,
+    "clarity_fix": "Example now says checkpoint verified, resume pending",
+    "methods": [
+      "source/contract inspection",
+      "80 executed tests",
+      "committed baseline vs candidate temporary-profile behavior"
+    ]
+  }
+}
