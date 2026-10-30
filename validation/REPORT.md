@@ -1,4 +1,11 @@
-# Model Switcher validation — 0.4.0
+# Model Switcher validation history and current native evidence
+
+The current 0.5.2 documentation correction reconciles the capability report with
+the authorized native 0.5.1 follow-up recorded below. Historical build/test outcomes
+remain scoped to their original revisions; they are not a current pending-approval
+gate. No runtime behavior or native permission changes in this correction.
+
+## Original 0.4.0 validation
 
 2026-10-29. The current user requested automatic model and reasoning-effort switching
 as a standing preference across their Codex chats, with a brief reason and verified
@@ -235,17 +242,18 @@ explicit choice/opt-out, Ultra delegation, supported-effort and overhead boundar
 Current 0.8 checkpoint commands replace retired review/planner requirements. Defaults
 are policy guidance, not benchmarks proving universal best-model performance.
 
-Existing native continuation guards remain unchanged. This repair case encountered
+Existing native continuation guards remained unchanged. The original 0.5 repair case encountered
 automatic approval rejection of a recurring heartbeat before registration/selection;
-the local intent was cancelled after registry absence was confirmed. The new live
-distinct-receiver check remains pending explicit approval. Do not claim a new
-executing-model observation, workaround or universal future-chat guarantee.
+the local intent was cancelled after registry absence was confirmed. Live verification
+was pending at that time. Later authorized observations below supersede that status
+without changing the historical rejected outcome or claiming a workaround.
 
 Offline 0.5 validation: 95 package/installer/native-guard/policy tests passed,
 including 15 behavioral routing cases. Three disposable Git fixtures saved and
 verified Sol Medium, Astra Extra High and Luna Low assignments through actual
 task-checkpoint 0.8.3 without a worker planner or recovery review. No model inference
-was invoked by those fixtures. New live handoff verification remains pending approval.
+was invoked by those fixtures. Those offline checks are separate from the later native
+handoff observations below; neither exposes per-turn inference telemetry.
 
 
 ## Authorized native follow-up — 2026-10-29
@@ -277,3 +285,35 @@ local socket access. Initial sandboxed readbacks in several chats failed before 
 reply. The permitted probe succeeded without a server start, model/config change
 or task write. This is a host-access diagnostic, not evidence of failed native
 continuation, and does not prove automatic delivery in those chats.
+
+## Protected readback and same-chat follow-up — 0.5.1
+
+On 2026-10-29 the human explicitly authorized an EPERM readback repair and a bounded
+native switching/resume check in the affected desktop chat. The ordinary sandbox
+probe failed on protected socket access; a normally approved read-only probe against
+the existing daemon succeeded without a permission/profile change or fallback server.
+The diagnostic was made precise and secret-safe; optional fixed model/list supplies
+the live model/effort catalog.
+
+Host readback confirmed Astra / Extra High as latest-persisted configuration. A
+distinct native receiver confirmed the origin completed, verified matching ownership,
+base/current checkpoint lineage, source/action/authority and fresh 43% allowance,
+claimed once and deleted its exact finite native heartbeat. Only after confirmed
+retirement returned execute:true did the receiver review/publish the candidate.
+It completed the guard, restored original Sol / Extra High with readback, saved and
+verified its final checkpoint, and normally released its own lease. One malformed
+CLI store path was rejected before mutation; only one durable claim occurred.
+
+101 source and 101 exported-package tests passed. Candidate/main/tag CI passed at
+the published 0.5.1 revision. Downloaded release and immutable source matched all 45
+public files; all 16 installed files matched. Existing 21 uid/gid/mode records and
+eight protected records were unchanged. An initially detected activation-block
+reorder was restored exactly and the installer/regression corrected before the final
+tested installation. No paid API calls, foreign task changes or permission weakening.
+
+This is actual configured-selection and distinct-turn admission evidence. Executing
+model identity for the historical turn is unavailable; guaranteed future delivery,
+universal activation, cross-device operation and cost/quality savings remain unproven.
+Private chat/task identifiers, lease tokens and raw account/approval receipts remain
+outside the public package. The 0.5.2 correction retains those limits and the original
+101-test acceptance; it requires no repeat notification or native handoff experiment.

@@ -3,7 +3,7 @@ name: model-switcher
 description: Route substantial work to suitable models and reasoning effort at intake, expensive phases, handoffs, scope changes and failed checks. Honor a user's global automatic-switching preference with brief reasons, verified checkpoints and guarded same-chat continuation. Keep trivial work lightweight, respect explicit model choices and opt-outs, and preserve separate Codex allowance and API budgets.
 license: MIT
 metadata:
-  version: "0.5.1"
+  version: "0.5.2"
 ---
 
 # Model switcher

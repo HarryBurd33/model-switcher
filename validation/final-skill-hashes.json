@@ -1,16 +1,18 @@
 {
   "LICENSE": "747b45fb70bbc46628a8a6b642f3c1283899f54b16f83398b527d96492d364ae",
-  "README.md": "952b9ec11a6db1ae3acce7825a3cc0024ec096fcb13d3953b684cd60cbad9f9a",
-  "SKILL.md": "2ca0b1d733b758459bf3617f7a42ec596980d90261280365189567f3d4948ac9",
+  "README.md": "656b0fd924fe6928de7d7309d029fd8897f5f3e63f07d60545bbd63b6e92cf00",
+  "SKILL.md": "f7d9b667cc4045452339abd6b5355d5984bfd5922da83b9bd43d33c3939510b3",
   "agents/openai.yaml": "530fed9206ef33c6a1cf62b385f21dc53edf730312b93650dbcab67ac5cb3981",
-  "references/active-chat.md": "567d1e53ea0390bc6dc3318823526da503431bf2bf66f414ebfeedd2cc18ea59",
-  "references/capabilities.md": "53fe895819492077611c4a69fb1dfb7be2e7033dc583d6f60197d3876ad4999b",
+  "references/active-chat.md": "756a591ccb4f7a53a3b220de7f0d5f3aa07497fb825384bb2f0e4ac92a4e80a8",
+  "references/capabilities.md": "ef6a8d112e2137f26254ee1fa12eb728bfcfcea1feaef2a2be2e0699dc3ffdc5",
   "references/continuation.md": "620d86d901ecd7d9deba27c00a213405b2ddb7382404d1ff1ac9d9478304db4b",
   "references/examples.md": "0e6df8a005b9e588a1942e065d506aca9f740dbf36f7f6d1793e2d88993d0726",
-  "references/host.md": "a1e001eb67f729f31c369131fc90478bf055c388167576efe916a6027601006f",
-  "references/runtime.md": "eff50b087a62544d27f5bbabd1c63e2ef80f86e69f9083944a856074f1b0081f",
-  "scripts/active_chat.py": "4e8f9d779287e5a7902826e0137cf593ab18838eb968c7374934ec7306213495",
+  "references/host.md": "ccc0ea62961c62384fc9d148e904d6be053c580bbd1ef3f8083571b31b8034de",
+  "references/routing-policy.md": "215709fdaba7c18202f2d856a4e32e0ad6fceb68f74eddee262b356625152314",
+  "references/runtime.md": "2546591b176495413bddd2fc4e31bba1a351706db1829aeb8f88c3d2f34ee45f",
+  "scripts/active_chat.py": "55c503fbd9812ebce44ec8effc3930dd66647044b255582b77dfbeadf4c80483",
   "scripts/continuation.py": "c49bb793a2e8871f4843fe67d0c38214a2e7d63fb3a579ec27188a4b51b0edeb",
-  "scripts/install.py": "f2521047ae49b52abf6728a8b919b21d53b5c99b0bfa0041550727b0c3bb2145",
-  "templates/handoff.md": "ccff497f3cba3908ad4b6e4cf1661351e55c1aa2e619b63d91d4963d3151b33c"
+  "scripts/install.py": "5cad10a560273af8da94c22c04d508cd57c9d28c178e2d25d1db7bbe7402cd20",
+  "scripts/routing_policy.py": "0a0b9cdc33ebe7a34371af10a23f5ec4e2f33d830b3959f976c096ec96a5d6d1",
+  "templates/handoff.md": "39fb0b77173ec4c713fe813b3a44bb68bbad1477a46048696d3c2083356866e9"
 }
