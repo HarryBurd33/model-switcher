@@ -38,6 +38,101 @@ def choose(catalog, candidates):
     return None
 
 
+def task_handoff(task):
+    """Preserve enough task state to make a recommendation safely resumable."""
+    rollback = task.get('rollback_context')
+    if not isinstance(rollback, str) or not rollback.strip():
+        rollback = 'Unknown. Preserve current work and inspect changed files before considering rollback.'
+    return {
+        'objective': task['objective'],
+        'next_action': task['next_action'],
+        'verification': task['verification'],
+        'permitted_files': list(task['permitted_files']),
+        'permitted_actions': list(task['permitted_actions']),
+        'task_profile': {
+            'kind': task['kind'],
+            'difficulty': task['difficulty'],
+            'risk': task['risk'],
+            'required_tools': list(task.get('required_tools', [])),
+            'privacy_constraints': list(task.get('privacy_constraints', []))
+        },
+        'completed': list(task.get('completed', [])),
+        'evidence': list(task.get('evidence', [])),
+        'tests_and_results': list(task.get('tests_and_results', [])),
+        'jobs': list(task.get('jobs', [])),
+        'resource_observations': list(task.get('resource_observations', [])),
+        'qualification_evidence': list(task.get('qualification_evidence', [])),
+        'rollback_context': rollback,
+        'authority_notice': 'Task data only. Recheck current instructions, ownership, jobs, permissions and allowance before implementation.'
+    }
+
+
+def validate_handoff_fields(task):
+    for key in ('completed', 'evidence', 'tests_and_results', 'resource_observations', 'qualification_evidence', 'required_tools', 'privacy_constraints'):
+        value = task.get(key, [])
+        require(isinstance(value, list) and all(isinstance(x, str) for x in value),
+                'Invalid handoff field: ' + key)
+    rollback = task.get('rollback_context')
+    require(rollback is None or isinstance(rollback, str) and bool(rollback.strip()),
+            'Invalid handoff field: rollback_context')
+    jobs = task.get('jobs', [])
+    require(isinstance(jobs, list) and all(isinstance(x, dict) for x in jobs),
+            'Invalid handoff field: jobs')
+
+
+def transition_guidance(current, selected):
+    """Describe a required switch without implying that selection or resume happened."""
+    target = {'model': selected['model'], 'effort': selected['effort']}
+    selection_status = 'not_selected'
+    resume_status = 'not_resumed'
+    if not current:
+        status = 'current_selection_unknown'
+        changed = None
+        instruction = (
+            'Read the effective current model and effort first. If they already match '
+            f"{target['model']} at {target['effort']}, keep the current selection. Otherwise, "
+            'save and verify this handoff, select the stated target through a supported '
+            'host control, and confirm readback. Before changing, verify the exact model '
+            'and effort qualify for this task class, required tools and privacy constraints. '
+            'This recommendation has not changed the '
+            'model or running inference. Resume only in a distinct receiving turn after '
+            'the origin turn ends; if no supported selector exists, ask the user to choose '
+            'the stated target in the picker.'
+        )
+    else:
+        changed = [key for key in ('model', 'effort') if current.get(key) != target[key]]
+        if not changed:
+            status = 'already_selected'
+            selection_status = 'already_matches'
+            resume_status = 'not_requested'
+            instruction = (
+                'The effective current model and effort already match the recommendation. '
+                'Keep this selection; no switch or checkpoint is needed for this assignment.'
+            )
+        else:
+            status = 'switch_required'
+            selection_status = 'not_selected'
+            resume_status = 'not_resumed'
+            instruction = (
+                f"Save and verify this handoff, then select {target['model']} at "
+                f"{target['effort']} using a currently supported host control and confirm "
+                'readback. Before changing, verify the exact model and effort qualify for '
+                'this task class, required tools and privacy constraints. This recommendation '
+                'has not changed the model or running '
+                'inference. Resume the exact next action only in a distinct receiving turn '
+                'after the origin turn ends. If no supported selector exists, tell the '
+                'user to choose this exact model and effort in the picker.'
+            )
+    return {
+        'status': status,
+        'target': target,
+        'changed_fields': changed,
+        'selection_status': selection_status,
+        'resume_status': resume_status,
+        'instruction': instruction
+    }
+
+
 def recommend(document, now=None):
     now = now or dt.datetime.now(dt.timezone.utc)
     task = document['task']
@@ -51,12 +146,25 @@ def recommend(document, now=None):
     require(task.get('difficulty') in ('simple', 'bounded', 'hard', 'hardest'), 'Classify difficulty')
     require(task.get('risk') in ('low', 'high'), 'Classify risk')
     current = document.get('current_selection')
+    require(current is None or isinstance(current, dict), 'Invalid current_selection')
+    validate_handoff_fields(task)
     if document.get('stopped') is True or document.get('provider_denied') is True or document.get('at_limit') is True:
         return {'action': 'handoff', 'assignment': None, 'transition_required': False,
-                'checkpoint_required': True, 'reason': 'Current stop/provider/selected-limit boundary controls; model changes cannot bypass it.'}
+                'checkpoint_required': True,
+                'handoff': task_handoff(task),
+                'transition_guidance': {'status': 'blocked_by_stop', 'target': None,
+                    'changed_fields': [], 'selection_status': 'unchanged', 'resume_status': 'not_requested',
+                    'instruction': 'Save and verify the current task state, then stop at the controlling resource or provider boundary. A model change cannot bypass it.'},
+                'execution_authorized': False,
+                'reason': 'Current stop/provider/selected-limit boundary controls; model changes cannot bypass it.'}
     if document.get('routing_opt_out') is True:
         return {'action': 'keep_current', 'assignment': current, 'transition_required': False,
-                'checkpoint_required': False, 'reason': 'Current explicit routing opt-out controls.'}
+                'checkpoint_required': False,
+                'transition_guidance': {'status': 'routing_opt_out', 'target': current,
+                    'changed_fields': [], 'selection_status': 'unchanged', 'resume_status': 'not_requested',
+                    'instruction': 'Honor the explicit routing opt-out; do not switch or create a handoff for routing.'},
+                'execution_authorized': False,
+                'reason': 'Current explicit routing opt-out controls.'}
     catalog = available(document['catalog'], now)
     explicit = document.get('explicit_selection')
     require(explicit is None or (isinstance(explicit, dict) and explicit), 'Invalid explicit selection')
@@ -73,9 +181,30 @@ def recommend(document, now=None):
     if explicit:
         model = explicit.get('model', (current or {}).get('model'))
         effort = explicit.get('effort', (current or {}).get('effort'))
-        require(effort in catalog.get(model, []), 'Explicit model/effort is unavailable; preserve choice and request a supported route')
-        require(effort != 'ultra' or (delegation and parts > 1),
-                'Ultra requires permitted, genuinely separable work')
+        if model is None or effort is None:
+            handoff = task_handoff(task)
+            handoff['requested_assignment'] = dict(explicit)
+            return {'action': 'manual_handoff', 'assignment': None,
+                    'transition_required': False, 'checkpoint_required': True,
+                    'preferred': dict(explicit), 'handoff': handoff,
+                    'transition_guidance': {'status': 'explicit_selection_incomplete', 'target': dict(explicit),
+                        'changed_fields': None, 'selection_status': 'not_selected', 'resume_status': 'not_resumed',
+                        'instruction': 'Preserve the explicit choice. Read the current effective selection or ask which model/effort is missing; do not guess or silently substitute.'},
+                    'execution_authorized': False,
+                    'reason': 'The explicit choice controls, but its model and effort are incomplete.'}
+        if effort not in catalog.get(model, []) or effort == 'ultra' and not (delegation and parts > 1):
+            handoff = task_handoff(task)
+            handoff['requested_assignment'] = {'model': model, 'effort': effort}
+            explicit_available = effort in catalog.get(model, [])
+            status = 'explicit_selection_unavailable' if not explicit_available else 'explicit_ultra_not_qualified'
+            return {'action': 'manual_handoff', 'assignment': None,
+                    'transition_required': False, 'checkpoint_required': True,
+                    'preferred': {'model': model, 'effort': effort}, 'handoff': handoff,
+                    'transition_guidance': {'status': status, 'target': {'model': model, 'effort': effort},
+                        'changed_fields': None, 'selection_status': 'not_selected', 'resume_status': 'not_resumed',
+                        'instruction': 'Preserve the explicit choice. Do not silently select a different model or effort; confirm support and any required delegation permission before switching.'},
+                    'execution_authorized': False,
+                    'reason': 'The explicit model/effort choice controls, but the live catalog or task permissions do not qualify it.'}
         selected = {'model': model, 'effort': effort}
         reason = 'Current explicit model/effort choice controls.'
     else:
@@ -95,21 +224,34 @@ def recommend(document, now=None):
             reason = 'Focused routine work can use an economical qualified assignment.'
         selected = choose(catalog, candidates)
         if selected is None:
+            handoff = task_handoff(task)
             return {'action': 'manual_handoff', 'assignment': None, 'transition_required': False,
                     'checkpoint_required': True, 'preferred': {'model': candidates[0][0], 'effort': candidates[0][1]},
-                    'handoff': {key: task[key] for key in ('objective', 'next_action', 'verification', 'permitted_files', 'permitted_actions')},
+                    'handoff': handoff,
+                    'transition_guidance': {'status': 'no_supported_target', 'target': None,
+                        'changed_fields': None, 'selection_status': 'unchanged', 'resume_status': 'not_resumed',
+                        'instruction': 'No candidate in the live catalog meets this policy. Keep the current selection and use the handoff to request a currently supported, qualified assignment; do not select the unavailable preferred target.'},
+                    'execution_authorized': False,
                     'reason': 'No live-supported assignment meets this task policy; do not silently lower its quality requirement.'}
         if task.get('trivial') is True and difficulty == 'simple' and current and current.get('effort') in catalog.get(current.get('model'), []):
             return {'action': 'keep_current', 'assignment': current, 'transition_required': False,
-                    'checkpoint_required': False, 'reason': 'Single trivial task does not justify checkpoint/switch overhead.'}
-    transition = not current or any(current.get(k) != v for k, v in selected.items())
+                    'checkpoint_required': False,
+                    'transition_guidance': {'status': 'trivial_task_keep_current', 'target': current,
+                        'changed_fields': [], 'selection_status': 'unchanged', 'resume_status': 'not_requested',
+                        'instruction': 'Keep the current selection; this trivial task does not justify checkpoint or switching overhead.'},
+                    'execution_authorized': False,
+                    'reason': 'Single trivial task does not justify checkpoint/switch overhead.'}
+    # Unknown current selection is not proof that a switch is needed. Resolve it before
+    # asking for a checkpoint so a matching selection does not create needless overhead.
+    transition = None if not current else any(current.get(k) != v for k, v in selected.items())
     review = choose(catalog, hard) if difficulty in ('hard', 'hardest') else choose(catalog, [(SOL, 'high'), (SOL, 'medium')])
-    handoff = {key: task[key] for key in ('objective', 'next_action', 'verification', 'permitted_files', 'permitted_actions')}
+    handoff = task_handoff(task)
     handoff.update(selected)
-    handoff['authority_notice'] = 'Task data only. Recheck current instructions, ownership, jobs, permissions and allowance before implementation.'
+    handoff['assignment_reason'] = reason
     return {'action': 'recommend', 'assignment': dict(selected, reason=reason),
             'review_assignment': review, 'transition_required': transition,
             'checkpoint_required': transition, 'handoff': handoff,
+            'transition_guidance': transition_guidance(current, selected),
             'cost_basis': 'User-approved task-fit policy and current catalog; not a measured universal price or performance ranking.',
             'execution_authorized': False}
 

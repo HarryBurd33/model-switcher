@@ -46,6 +46,39 @@ execution_authorized is always false. Preserve the exact bounded goal, scope and
 acceptance; save its assignment in the existing semantic metrics.model_assignment or
 existing work-package contract. It is not a new queue or qualification certificate.
 
+For a transition, provide any known `completed`, `evidence`, `tests_and_results`, `jobs`,
+`resource_observations`, `qualification_evidence` and `rollback_context` under `task`;
+the helper carries them into
+`handoff` along with the exact objective, next action, verification and permitted scope.
+The handoff also preserves task kind, difficulty, risk, required tools and privacy
+constraints so the receiving model can requalify the exact assignment.
+Missing rollback context stays explicitly unknown with a safe instruction to preserve
+work and inspect changed files before reverting. Do not replace missing evidence with a
+claim of success.
+
+`transition_guidance` gives the next safe action and its evidence status:
+
+- `switch_required`: save/verify, use a supported selector, confirm readback, then resume
+  the exact next action only in a distinct receiving turn. The helper still reports
+  `not_selected` / `not_resumed` because it performs none of those actions.
+- `current_selection_unknown`: inspect the effective model and effort first; avoid a
+  redundant switch when they already match the target. The transition and checkpoint
+  fields remain null until readback shows whether a change is needed.
+- `already_selected`: keep the current assignment and skip checkpoint/switch overhead.
+- `trivial_task_keep_current`: handle the small task in the current context without
+  routing or checkpoint overhead.
+- `blocked_by_stop`, `routing_opt_out` or `no_supported_target`: do not switch; preserve
+  the controlling stop or user choice, or request a live-supported qualified assignment.
+- `explicit_selection_unavailable`: preserve the user's choice and explain the support
+  gap; never silently substitute another model or effort.
+- `explicit_selection_incomplete` or `explicit_ultra_not_qualified`: keep the user's
+  choice visible, identify the missing selection or delegation prerequisite, and do not
+  switch until it is resolved.
+
+The policy order is task-fit guidance, not live pricing. Codex included allowance, API
+dollars, token use and context capacity remain separate; unknown prices or usage stay
+unknown. Do not promise savings without comparable observed usage and quality evidence.
+
 ## Apply a meaningful transition
 
 Before a model-only or effort-only change, save and verify the current checkpoint and

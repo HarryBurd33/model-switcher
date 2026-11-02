@@ -11,7 +11,11 @@
   existing reserves/stops; no paid fallback; attempts/time/API spending boundary:
 - Exact currently available recommended model and supported effort, required tools and reason:
 - Selection mode and live authority source (task/chat instruction or standing global preference):
-- Transition receipt: proposed / selected and verified / resume scheduled / receiving turn observed:
+- Transition status: recommended / selected and verified / resume scheduled / receiving turn observed;
+  include host readback evidence and never imply a later state without proof:
+- Supported switch steps or exact manual picker target, plus copyable next-turn instruction:
+- Rollback/recovery context: files or state to preserve, safe rollback boundary, and what must
+  be inspected before reverting; unknown = explicitly unknown:
 - Next bounded action and verification:
 - Verified checkpoint bundle and HANDOFF.md locations (or explicitly unsaved emergency copy):
 - Ownership authority, current holder and safe release status:

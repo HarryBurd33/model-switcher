@@ -1,4 +1,4 @@
-# Model Switcher 0.5.2
+# Model Switcher 0.5.3
 
 A user-level Codex policy for strong planning, economical qualified work and verified
 completion. Subscription allowance and API spending are separate resources. This is a
@@ -60,6 +60,12 @@ ready manual handoff. It requires no new paid service. The optional task-checkpo
 bounded code to Sol Medium, suitable visual work to Terra Medium, and hard diagnosis
 or review to Astra Extra High/Max. Ultra requires permitted independent subtasks.
 These are live-catalog-qualified defaults, not measured universal cost rankings.
+
+A justified transition names the exact model and effort, carries task evidence and rollback
+context in the handoff, and states whether selection is still pending. If the current
+selection is unknown, inspect it before creating a checkpoint. If it already matches, skip
+the handoff. When no supported host selector exists, give the user the exact picker target
+and next-turn instruction without claiming the model changed.
 
 `$model-switcher Complete this feature with these acceptance tests.`
 

@@ -3,7 +3,7 @@ name: model-switcher
 description: Route substantial work to suitable models and reasoning effort at intake, expensive phases, handoffs, scope changes and failed checks. Honor a user's global automatic-switching preference with brief reasons, verified checkpoints and guarded same-chat continuation. Keep trivial work lightweight, respect explicit model choices and opt-outs, and preserve separate Codex allowance and API budgets.
 license: MIT
 metadata:
-  version: "0.5.2"
+  version: "0.5.3"
 ---
 
 # Model switcher
@@ -132,6 +132,17 @@ This selects the model for subsequent turns. A configuration cue can arrive as s
 in the current turn: it proves neither a new turn nor changed executing inference. Never
 repost the cue to force continuation or duplicate work.
 
+Treat the helper's `transition_guidance` as a recommendation, not a switch receipt. If it
+says `switch_required`, state the exact target model and effort, save and verify the
+handoff, use only a supported host selector, and verify the host readback. Until readback
+matches, say the target is recommended or selection is pending; never say the model
+changed or work resumed. If the current selection is unknown, inspect it first. If it
+already matches, keep it without a checkpoint. If selection is unsupported, give the user
+the exact picker target and ready resume instruction. Preserve completed work, active or
+uncertain jobs, qualification evidence, test results, resource observations and rollback
+context in the handoff. If rollback context is unavailable, mark it unknown and require
+inspection before revert.
+
 For authorized automatic continuation after selection, including the standing global
 preference, use the [one-use continuation
 procedure](references/continuation.md). Reuse the task lease/checkpoint/jobs, bind the
@@ -165,6 +176,8 @@ Announce only a meaningful phase or transition: sufficient model/effort, why it 
 the overhead, and whether the user must act. Manual handoffs must name an exact currently
 available model and supported effort, verified checkpoint path, supported switching steps
 and a copyable resume instruction. Claim completion only after original acceptance passes.
+Distinguish `recommended`, `selected and verified`, `resume scheduled` and `receiving turn
+observed`; report only the state supported by evidence.
 
 For setup, update, rollback and uninstall, see [README](README.md). For cases and evidence
 limits, see [examples](references/examples.md) and [capability report](references/capabilities.md).
