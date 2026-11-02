@@ -53,7 +53,11 @@ class RoutingPolicy(unittest.TestCase):
         self.assertEqual(self.run_policy(request('analysis', 'hardest', delegation_allowed=True, independent_parts=3))['assignment']['effort'], 'ultra')
         self.assertNotEqual(self.run_policy(request('analysis', 'hardest', delegation_allowed=True, independent_parts=1))['assignment']['effort'], 'ultra')
         value = request(); value['explicit_selection'] = {'model': policy.ASTRA, 'effort': 'ultra'}
-        with self.assertRaisesRegex(ValueError, 'Ultra'): self.run_policy(value)
+        result = self.run_policy(value)
+        self.assertEqual(result['action'], 'manual_handoff')
+        self.assertEqual(result['transition_guidance']['status'], 'explicit_ultra_not_qualified')
+        self.assertIsNone(result['assignment'])
+        self.assertFalse(result['execution_authorized'])
 
     def test_explicit_choice_and_effort_only_choice_are_preserved(self):
         value = request('analysis', 'hardest')
@@ -64,7 +68,13 @@ class RoutingPolicy(unittest.TestCase):
 
     def test_explicit_unsupported_choice_does_not_silently_fallback(self):
         value = request(); value['explicit_selection'] = {'model': policy.LUNA, 'effort': 'ultra'}
-        with self.assertRaisesRegex(ValueError, 'unavailable'): self.run_policy(value)
+        result = self.run_policy(value)
+        self.assertEqual(result['action'], 'manual_handoff')
+        self.assertEqual(result['preferred'], value['explicit_selection'])
+        self.assertEqual(result['transition_guidance']['status'], 'explicit_selection_unavailable')
+        self.assertEqual(result['transition_guidance']['selection_status'], 'not_selected')
+        self.assertIsNone(result['assignment'])
+        self.assertFalse(result['execution_authorized'])
 
     def test_opt_out_and_actual_stop_are_independent(self):
         value = request(); value['routing_opt_out'] = True
