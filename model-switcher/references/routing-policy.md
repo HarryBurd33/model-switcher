@@ -35,7 +35,8 @@ Run scripts/routing_policy.py --input INPUT.json from the skill folder. Its inpu
   risk (low/high), objective, next_action, verification, permitted_files and
   permitted_actions. All scope/action/verification data comes from the current task.
   Optional failed_checks, trivial, independent_parts and delegation_allowed qualify
-  escalation and orchestration.
+  escalation and orchestration. Optional handoff string lists must contain nonblank
+  strings; use an empty list when there are no entries.
 - current_selection: a complete observed model and effort; partial or empty readback is
   unknown. Inspect it before recommending a switch or creating a checkpoint. An optional
   explicit_selection overrides one or both. routing_opt_out preserves the current assignment.

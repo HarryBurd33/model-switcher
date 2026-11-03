@@ -167,6 +167,14 @@ class RoutingPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Invalid catalog entry'):
             routing_policy.recommend(value, NOW)
 
+    def test_handoff_string_lists_reject_blank_entries(self):
+        fields = ('completed', 'evidence', 'tests_and_results', 'resource_observations',
+                  'qualification_evidence', 'required_tools', 'privacy_constraints')
+        for key in fields:
+            with self.subTest(field=key):
+                with self.assertRaisesRegex(ValueError, 'Invalid handoff field: ' + key):
+                    routing_policy.recommend(fixture(task={key: ['  ']}), NOW)
+
     def test_unknown_or_partial_current_selection_requires_readback_before_switching(self):
         partial_selections = (
             None,

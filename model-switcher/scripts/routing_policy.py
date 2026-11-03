@@ -73,7 +73,7 @@ def task_handoff(task):
 def validate_handoff_fields(task):
     for key in ('completed', 'evidence', 'tests_and_results', 'resource_observations', 'qualification_evidence', 'required_tools', 'privacy_constraints'):
         value = task.get(key, [])
-        require(isinstance(value, list) and all(isinstance(x, str) for x in value),
+        require(isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value),
                 'Invalid handoff field: ' + key)
     rollback = task.get('rollback_context')
     require(rollback is None or isinstance(rollback, str) and bool(rollback.strip()),
