@@ -12,10 +12,12 @@ These are conservative defaults, not a measured global price or quality ranking.
 | Difficult diagnosis, architecture, conflicting evidence, high-risk review | Astra Extra High | Max for hardest serial reasoning |
 | Hard work with independent parts and permitted delegation | Astra Ultra when supported | Retain one controlled writer and bounded acceptance |
 
-Preserve explicit model/effort choices and opt-outs. A single trivial task can stay on
-the current model when switching overhead would exceed the benefit. Reassess after
-failed acceptance or a meaningful scope/phase change. Do not remain on an expensive
-assignment by inertia once a substantial next package is safely bounded.
+Preserve explicit model/effort choices and opt-outs. For a simple, low-risk task with
+no failed checks and no explicit selection, use the current context without catalog-based
+routing or checkpoint overhead. Higher risk, failed checks and explicit selections still
+follow the normal policy. Reassess after failed acceptance or a meaningful scope/phase
+change. Do not remain on an expensive assignment by inertia once a substantial next
+package is safely bounded.
 
 Ultra includes automatic delegation. Require both actual separable parts and current
 delegation permission, plus catalog support. Serial workflows use Extra High/Max;

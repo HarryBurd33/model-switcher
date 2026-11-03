@@ -70,6 +70,26 @@ class RoutingPolicyTests(unittest.TestCase):
         self.assertEqual(result['handoff']['task_profile']['privacy_constraints'], ['local-only'])
         self.assertFalse(result['execution_authorized'])
 
+    def test_trivial_low_risk_task_skips_catalog_but_respects_risk_and_explicit_choice(self):
+        value = fixture(task={'trivial': True}, current=None)
+        value['catalog'] = {'observed_at': 'stale', 'data': []}
+        result = routing_policy.recommend(value, NOW)
+        self.assertEqual(result['action'], 'keep_current')
+        self.assertIsNone(result['assignment'])
+        self.assertFalse(result['transition_required'])
+        self.assertFalse(result['checkpoint_required'])
+        self.assertEqual(result['transition_guidance']['status'], 'trivial_task_keep_current')
+
+        value = fixture(task={'trivial': True, 'risk': 'high'}, current=None)
+        result = routing_policy.recommend(value, NOW)
+        self.assertEqual(result['assignment']['model'], ASTRA)
+
+        value = fixture(task={'trivial': True}, current={'model': SOL, 'effort': 'medium'},
+                        explicit_selection={'model': ASTRA, 'effort': 'xhigh'})
+        result = routing_policy.recommend(value, NOW)
+        self.assertEqual(result['assignment']['model'], ASTRA)
+        self.assertEqual(result['assignment']['effort'], 'xhigh')
+
     def test_same_assignment_avoids_unneeded_switch_and_checkpoint(self):
         result = routing_policy.recommend(fixture(
             task={'kind': 'coding', 'difficulty': 'bounded'},

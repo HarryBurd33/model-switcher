@@ -172,18 +172,27 @@ def recommend(document, now=None):
                     'instruction': 'Honor the explicit routing opt-out; do not switch or create a handoff for routing.'},
                 'execution_authorized': False,
                 'reason': 'Current explicit routing opt-out controls.'}
-    catalog = available(document['catalog'], now)
     explicit = document.get('explicit_selection')
     require(explicit is None or (isinstance(explicit, dict) and explicit), 'Invalid explicit selection')
     failures = task.get('failed_checks', 0)
     require(type(failures) is int and failures >= 0, 'Invalid failed-check count')
+    difficulty = task['difficulty']
+    if (task['risk'] == 'high' or failures) and difficulty in ('simple', 'bounded'):
+        difficulty = 'hard'
+    if (task.get('trivial') is True and difficulty == 'simple' and
+            task['risk'] == 'low' and failures == 0 and explicit is None):
+        return {'action': 'keep_current', 'assignment': current, 'transition_required': False,
+                'checkpoint_required': False,
+                'transition_guidance': {'status': 'trivial_task_keep_current', 'target': current,
+                    'changed_fields': [], 'selection_status': 'unchanged', 'resume_status': 'not_requested',
+                    'instruction': 'This simple, low-risk task has no failed checks or explicit selection. Handle it in the current context without catalog routing, switching, or a checkpoint.'},
+                'execution_authorized': False,
+                'reason': 'A trivial task does not justify catalog, routing, or checkpoint overhead.'}
+    catalog = available(document['catalog'], now)
     parts = task.get('independent_parts', 1)
     require(type(parts) is int and parts >= 1, 'Invalid independent-part count')
     delegation = task.get('delegation_allowed', False)
     require(type(delegation) is bool, 'Delegation authority must be explicit')
-    difficulty = task['difficulty']
-    if (task['risk'] == 'high' or failures) and difficulty in ('simple', 'bounded'):
-        difficulty = 'hard'
     hard = [(ASTRA, 'xhigh'), (ASTRA, 'max'), (SOL, 'xhigh'), (SOL, 'max')]
     if explicit:
         model = explicit.get('model', (current or {}).get('model'))
@@ -240,14 +249,6 @@ def recommend(document, now=None):
                         'instruction': 'No candidate in the live catalog meets this policy. Keep the current selection and use the handoff to request a currently supported, qualified assignment; do not select the unavailable preferred target.'},
                     'execution_authorized': False,
                     'reason': 'No live-supported assignment meets this task policy; do not silently lower its quality requirement.'}
-        if task.get('trivial') is True and difficulty == 'simple' and current and current.get('effort') in catalog.get(current.get('model'), []):
-            return {'action': 'keep_current', 'assignment': current, 'transition_required': False,
-                    'checkpoint_required': False,
-                    'transition_guidance': {'status': 'trivial_task_keep_current', 'target': current,
-                        'changed_fields': [], 'selection_status': 'unchanged', 'resume_status': 'not_requested',
-                        'instruction': 'Keep the current selection; this trivial task does not justify checkpoint or switching overhead.'},
-                    'execution_authorized': False,
-                    'reason': 'Single trivial task does not justify checkpoint/switch overhead.'}
     # Unknown current selection is not proof that a switch is needed. Resolve it before
     # asking for a checkpoint so a matching selection does not create needless overhead.
     transition = None if not current else any(current.get(k) != v for k, v in selected.items())
