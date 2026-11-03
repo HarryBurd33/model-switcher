@@ -39,6 +39,9 @@ Run scripts/routing_policy.py --input INPUT.json from the skill folder. Its inpu
 - current_selection: a complete observed model and effort; partial or empty readback is
   unknown. Inspect it before recommending a switch or creating a checkpoint. An optional
   explicit_selection overrides one or both. routing_opt_out preserves the current assignment.
+- explicit_selection: preserve the requested fields and require nonempty model and effort
+  strings before catalog lookup. Malformed values produce a manual handoff; never coerce
+  or silently substitute a requested selection.
 - stopped, provider_denied and at_limit represent ACTUAL independent controls. Under
   task-checkpoint 0.8, retired quota-stop files and unknown readings are not such stops.
   A selected exhaustion override ignores the numeric reserve; actual provider denial

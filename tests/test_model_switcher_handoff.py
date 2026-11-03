@@ -116,6 +116,24 @@ class RoutingPolicyTests(unittest.TestCase):
         self.assertEqual(result['handoff']['tests_and_results'], task['tests_and_results'])
         self.assertEqual(result['handoff']['rollback_context'], task['rollback_context'])
 
+    def test_malformed_explicit_selection_is_preserved_without_coercion(self):
+        selections = (
+            {'model': ['gpt-6.1-sol'], 'effort': 'medium'},
+            {'model': 'gpt-6.1-sol', 'effort': []},
+            {'model': '  ', 'effort': 'medium'},
+            {'model': 'gpt-6.1-sol', 'effort': ' '},
+        )
+        for explicit in selections:
+            with self.subTest(explicit=explicit):
+                result = routing_policy.recommend(fixture(
+                    current={'model': SOL, 'effort': 'medium'}, explicit_selection=explicit), NOW)
+                self.assertEqual(result['action'], 'manual_handoff')
+                self.assertIsNone(result['assignment'])
+                self.assertEqual(result['preferred'], explicit)
+                self.assertEqual(result['handoff']['requested_assignment'], explicit)
+                self.assertEqual(result['transition_guidance']['status'], 'explicit_selection_invalid')
+                self.assertFalse(result['execution_authorized'])
+
     def test_unavailable_explicit_choice_is_preserved_without_claiming_switch(self):
         result = routing_policy.recommend(fixture(
             current={'model': SOL, 'effort': 'medium'},

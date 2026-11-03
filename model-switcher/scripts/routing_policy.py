@@ -208,6 +208,18 @@ def recommend(document, now=None):
                         'instruction': 'Preserve the explicit choice. Read the current effective selection or ask which model/effort is missing; do not guess or silently substitute.'},
                     'execution_authorized': False,
                     'reason': 'The explicit choice controls, but its model and effort are incomplete.'}
+        if (not isinstance(model, str) or not model.strip() or model != model.strip() or
+                not isinstance(effort, str) or not effort.strip() or effort != effort.strip()):
+            handoff = task_handoff(task)
+            handoff['requested_assignment'] = dict(explicit)
+            return {'action': 'manual_handoff', 'assignment': None,
+                    'transition_required': False, 'checkpoint_required': True,
+                    'preferred': dict(explicit), 'handoff': handoff,
+                    'transition_guidance': {'status': 'explicit_selection_invalid', 'target': dict(explicit),
+                        'changed_fields': None, 'selection_status': 'not_selected', 'resume_status': 'not_resumed',
+                        'instruction': 'Preserve the exact choice. Ask for nonempty model and effort strings without surrounding whitespace; do not coerce, substitute or switch.'},
+                    'execution_authorized': False,
+                    'reason': 'The explicit choice has a malformed model or effort value.'}
         if effort not in catalog.get(model, []) or effort == 'ultra' and not (delegation and parts > 1):
             handoff = task_handoff(task)
             handoff['requested_assignment'] = {'model': model, 'effort': effort}
