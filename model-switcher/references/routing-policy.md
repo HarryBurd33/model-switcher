@@ -27,7 +27,8 @@ honest supported fallback or ready manual handoff, never invented availability.
 Run scripts/routing_policy.py --input INPUT.json from the skill folder. Its input is:
 
 - catalog: observed_at (timezone-aware, at most 120 seconds old), data from model/list.
-  Each entry has model and supportedReasoningEfforts, or normalized efforts.
+  Each entry must be an object with a nonempty, unique model ID and supportedReasoningEfforts,
+  or normalized efforts. Reject malformed entries instead of silently ignoring them.
 - task: kind (routine/coding/visual/analysis), difficulty (simple/bounded/hard/hardest),
   risk (low/high), objective, next_action, verification, permitted_files and
   permitted_actions. All scope/action/verification data comes from the current task.

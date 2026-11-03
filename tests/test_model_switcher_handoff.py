@@ -117,6 +117,18 @@ class RoutingPolicyTests(unittest.TestCase):
         self.assertIn('rollback_context', result['handoff'])
         self.assertFalse(result['execution_authorized'])
 
+    def test_malformed_catalog_model_identifiers_are_rejected(self):
+        for model in (None, '', '  ', 7):
+            value = fixture()
+            value['catalog']['data'][0]['model'] = model
+            with self.subTest(model=model):
+                with self.assertRaisesRegex(ValueError, 'Invalid catalog model identifier'):
+                    routing_policy.recommend(value, NOW)
+        value = fixture()
+        value['catalog']['data'][0] = None
+        with self.assertRaisesRegex(ValueError, 'Invalid catalog entry'):
+            routing_policy.recommend(value, NOW)
+
     def test_unknown_or_partial_current_selection_requires_readback_before_switching(self):
         partial_selections = (
             None,

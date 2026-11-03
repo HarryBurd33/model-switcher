@@ -20,7 +20,10 @@ def available(document, now):
             'Live catalog is stale or future-dated')
     result = {}
     for item in document['data']:
-        model = item['model']
+        require(isinstance(item, dict), 'Invalid catalog entry')
+        model = item.get('model')
+        require(isinstance(model, str) and bool(model.strip()) and model == model.strip(),
+                'Invalid catalog model identifier')
         require(model not in result, 'Ambiguous catalog model')
         efforts = item.get('efforts')
         if efforts is None:
