@@ -117,13 +117,22 @@ class RoutingPolicyTests(unittest.TestCase):
         self.assertIn('rollback_context', result['handoff'])
         self.assertFalse(result['execution_authorized'])
 
-    def test_unknown_current_selection_requires_readback_before_switching(self):
-        result = routing_policy.recommend(fixture(current=None), NOW)
-        self.assertIsNone(result['transition_required'])
-        self.assertIsNone(result['checkpoint_required'])
-        self.assertEqual(result['transition_guidance']['status'], 'current_selection_unknown')
-        self.assertIn('Read the effective current model and effort first', result['transition_guidance']['instruction'])
-        self.assertEqual(result['transition_guidance']['selection_status'], 'not_selected')
+    def test_unknown_or_partial_current_selection_requires_readback_before_switching(self):
+        partial_selections = (
+            None,
+            {'model': SOL},
+            {'effort': 'medium'},
+            {'model': SOL, 'effort': None},
+            {'model': ' ', 'effort': 'medium'},
+        )
+        for current in partial_selections:
+            with self.subTest(current=current):
+                result = routing_policy.recommend(fixture(current=current), NOW)
+                self.assertIsNone(result['transition_required'])
+                self.assertIsNone(result['checkpoint_required'])
+                self.assertEqual(result['transition_guidance']['status'], 'current_selection_unknown')
+                self.assertIn('Read the effective current model and effort first', result['transition_guidance']['instruction'])
+                self.assertEqual(result['transition_guidance']['selection_status'], 'not_selected')
 
     def test_missing_rollback_context_is_explicitly_unknown(self):
         result = routing_policy.recommend(fixture(

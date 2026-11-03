@@ -53,7 +53,8 @@ considered only while processing authorized work. [Setup and preference controls
    second queue or database for the same task. [Runtime procedure](references/runtime.md).
 3. Discover current tools, account restrictions, available models and supported
    efforts. Separate the effective current chat setting from a configured default.
-   If the active setting cannot be inspected, mark it unknown. Catalog descriptions,
+   If the active setting cannot be inspected or either model or effort is missing, mark
+   it unknown. Catalog descriptions,
    current task-specific evidence and qualification determine suitability; a model
    name or list position alone does not establish strength or cost.
 4. Use the strongest suitable available model for substantial planning and difficult

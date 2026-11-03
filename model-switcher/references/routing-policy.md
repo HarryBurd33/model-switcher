@@ -33,8 +33,9 @@ Run scripts/routing_policy.py --input INPUT.json from the skill folder. Its inpu
   permitted_actions. All scope/action/verification data comes from the current task.
   Optional failed_checks, trivial, independent_parts and delegation_allowed qualify
   escalation and orchestration.
-- current_selection: observed model and effort; optional explicit_selection overrides
-  one or both. routing_opt_out preserves the current assignment.
+- current_selection: a complete observed model and effort; partial or empty readback is
+  unknown. Inspect it before recommending a switch or creating a checkpoint. An optional
+  explicit_selection overrides one or both. routing_opt_out preserves the current assignment.
 - stopped, provider_denied and at_limit represent ACTUAL independent controls. Under
   task-checkpoint 0.8, retired quota-stop files and unknown readings are not such stops.
   A selected exhaustion override ignores the numeric reserve; actual provider denial

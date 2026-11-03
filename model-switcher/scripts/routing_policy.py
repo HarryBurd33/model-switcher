@@ -147,6 +147,10 @@ def recommend(document, now=None):
     require(task.get('risk') in ('low', 'high'), 'Classify risk')
     current = document.get('current_selection')
     require(current is None or isinstance(current, dict), 'Invalid current_selection')
+    if current is not None and any(
+            not isinstance(current.get(key), str) or not current[key].strip()
+            for key in ('model', 'effort')):
+        current = None
     validate_handoff_fields(task)
     if document.get('stopped') is True or document.get('provider_denied') is True or document.get('at_limit') is True:
         return {'action': 'handoff', 'assignment': None, 'transition_required': False,
