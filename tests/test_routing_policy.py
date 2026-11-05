@@ -16,7 +16,8 @@ def request(kind='routine', difficulty='bounded', **task_changes):
             'verification': 'Run the frozen acceptance command and inspect exact output',
             'permitted_files': ['selected.py'], 'permitted_actions': ['edit', 'test']}
     task.update(task_changes)
-    return {'task': task, 'current_selection': {'model': policy.SOL, 'effort': 'xhigh'},
+    return {'task': task, 'current_selection': {'model': policy.SOL, 'effort': 'xhigh',
+                            'observed_at': NOW.isoformat()},
             'catalog': {'observed_at': NOW.isoformat(), 'data': [
                 {'model': m, 'efforts': list(policy.EFFORTS if m != policy.LUNA else policy.EFFORTS[:-1])}
                 for m in (policy.SOL, policy.ASTRA, policy.TERRA, policy.LUNA)]}}
@@ -109,6 +110,34 @@ class RoutingPolicy(unittest.TestCase):
         value = request(difficulty='simple', trivial=True)
         self.assertEqual(self.run_policy(value)['action'], 'keep_current')
         self.assertFalse(self.run_policy(value)['checkpoint_required'])
+
+    def test_current_selection_requires_a_fresh_readback(self):
+        for selection, expected in [
+            ({'model': policy.SOL, 'effort': 'medium'}, 'current_selection_unknown'),
+            ({'model': policy.SOL, 'effort': 'medium', 'observed_at': '2026-10-28T23:57:59+00:00'},
+             'current_selection_stale'),
+            ({'model': policy.SOL, 'effort': 'medium', 'observed_at': '2026-10-29T00:00:01+00:00'},
+             'current_selection_stale'),
+            ({'model': policy.SOL, 'effort': 'medium', 'observed_at': 'not-a-timestamp'},
+             'current_selection_stale'),
+        ]:
+            with self.subTest(selection=selection):
+                value = request('coding')
+                value['current_selection'] = selection
+                result = self.run_policy(value)
+                self.assertIsNone(result['transition_required'])
+                self.assertIsNone(result['checkpoint_required'])
+                self.assertEqual(result['transition_guidance']['status'], expected)
+                self.assertEqual(result['transition_guidance']['selection_status'], 'not_selected')
+                self.assertFalse(result['execution_authorized'])
+
+        value = request('coding')
+        value['current_selection'] = {'model': policy.SOL, 'effort': 'medium',
+                                      'observed_at': '2026-10-29T00:00:00+00:00'}
+        result = self.run_policy(value)
+        self.assertFalse(result['transition_required'])
+        self.assertFalse(result['checkpoint_required'])
+        self.assertEqual(result['transition_guidance']['status'], 'already_selected')
 
     def test_handoff_preserves_exact_scope_action_and_acceptance(self):
         value = request('coding'); result = self.run_policy(value)

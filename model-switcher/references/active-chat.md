@@ -49,9 +49,11 @@ Plan input fields (proposed local adapter contract):
   "authorization": {"confirmed": true, "source": "Current human instruction authorizing this chat's selection"},
   "resources": {"observed_at": "FRESH_UTC_TIME", "ordinary_usage_allowed": true, "reserve_ok": true},
   "pending_operations": [],
-  "current_selection": {"model": "OBSERVED_MODEL", "effort": "OBSERVED_EFFORT"}
+  "current_selection": {"model": "OBSERVED_MODEL", "effort": "OBSERVED_EFFORT", "observed_at": "FRESH_UTC_TIME"}
 }
 ```
+
+Map a fresh `inspect` result's `thread.model` and `thread.reasoningEffort` into `current_selection`, and copy the probe's `observed_at`; do not fill a timestamp from memory or reuse a prior readback.
 
 Attestations must come from actual current evidence, not values invented to pass a guard.
 Freshness defaults to 120 seconds. Missing, future, stale or low evidence fails closed.

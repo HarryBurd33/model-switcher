@@ -34,6 +34,27 @@ def available(document, now):
     return result
 
 
+def current_selection_state(value, now):
+    """Trust a model/effort pair only while its host readback is fresh."""
+    if value is None:
+        return None, 'current_selection_unknown'
+    require(isinstance(value, dict), 'Invalid current_selection')
+    if any(not isinstance(value.get(key), str) or not value[key].strip()
+           for key in ('model', 'effort')):
+        return None, 'current_selection_unknown'
+    observed_at = value.get('observed_at')
+    if not isinstance(observed_at, str) or not observed_at.strip():
+        return None, 'current_selection_unknown'
+    try:
+        stamp = dt.datetime.fromisoformat(observed_at.replace('Z', '+00:00'))
+    except (TypeError, ValueError):
+        return None, 'current_selection_stale'
+    if (stamp.tzinfo is None or stamp.utcoffset() is None or
+            not 0 <= (now - stamp).total_seconds() <= 120):
+        return None, 'current_selection_stale'
+    return value, None
+
+
 def choose(catalog, candidates):
     for model, effort in candidates:
         if effort in catalog.get(model, []):
@@ -83,13 +104,13 @@ def validate_handoff_fields(task):
             'Invalid handoff field: jobs')
 
 
-def transition_guidance(current, selected):
+def transition_guidance(current, selected, unknown_status='current_selection_unknown'):
     """Describe a required switch without implying that selection or resume happened."""
     target = {'model': selected['model'], 'effort': selected['effort']}
     selection_status = 'not_selected'
     resume_status = 'not_resumed'
     if not current:
-        status = 'current_selection_unknown'
+        status = unknown_status
         changed = None
         instruction = (
             'Read the effective current model and effort first. If they already match '
@@ -148,12 +169,7 @@ def recommend(document, now=None):
     require(task.get('kind') in ('routine', 'coding', 'visual', 'analysis'), 'Classify task kind')
     require(task.get('difficulty') in ('simple', 'bounded', 'hard', 'hardest'), 'Classify difficulty')
     require(task.get('risk') in ('low', 'high'), 'Classify risk')
-    current = document.get('current_selection')
-    require(current is None or isinstance(current, dict), 'Invalid current_selection')
-    if current is not None and any(
-            not isinstance(current.get(key), str) or not current[key].strip()
-            for key in ('model', 'effort')):
-        current = None
+    current, current_status = current_selection_state(document.get('current_selection'), now)
     validate_handoff_fields(task)
     if document.get('stopped') is True or document.get('provider_denied') is True or document.get('at_limit') is True:
         return {'action': 'handoff', 'assignment': None, 'transition_required': False,
@@ -271,7 +287,8 @@ def recommend(document, now=None):
     return {'action': 'recommend', 'assignment': dict(selected, reason=reason),
             'review_assignment': review, 'transition_required': transition,
             'checkpoint_required': transition, 'handoff': handoff,
-            'transition_guidance': transition_guidance(current, selected),
+            'transition_guidance': transition_guidance(
+                current, selected, current_status or 'current_selection_unknown'),
             'cost_basis': 'User-approved task-fit policy and current catalog; not a measured universal price or performance ranking.',
             'execution_authorized': False}
 

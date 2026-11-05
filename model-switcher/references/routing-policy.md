@@ -37,8 +37,10 @@ Run scripts/routing_policy.py --input INPUT.json from the skill folder. Its inpu
   Optional failed_checks, trivial, independent_parts and delegation_allowed qualify
   escalation and orchestration. Optional handoff string lists must contain nonblank
   strings; use an empty list when there are no entries.
-- current_selection: a complete observed model and effort; partial or empty readback is
-  unknown. Inspect it before recommending a switch or creating a checkpoint. An optional
+- current_selection: a complete host readback with model, effort and an observed_at
+  timestamp no more than 120 seconds old. Missing timestamps or partial readbacks are
+  unknown; malformed, timezone-naive, future-dated or stale timestamps are stale. Inspect the effective
+  selection again before deciding whether to switch or checkpoint. An optional
   explicit_selection overrides one or both. routing_opt_out preserves the current assignment.
 - explicit_selection: preserve the requested fields and require nonempty model and effort
   strings before catalog lookup. Malformed values produce a manual handoff; never coerce
