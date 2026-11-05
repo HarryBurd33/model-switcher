@@ -33,6 +33,11 @@ def fixture(task=None, current=None, catalog=None, **extra):
         'rollback_context': 'No source edits yet; preserve current worktree.'
     }
     base_task.update(task or {})
+    if isinstance(current, dict):
+        current = dict(current)
+        if all(isinstance(current.get(key), str) and current[key].strip()
+               for key in ('model', 'effort')):
+            current.setdefault('observed_at', NOW.isoformat())
     default_catalog = [
         {'model': LUNA, 'efforts': ['low', 'medium']},
         {'model': SOL, 'efforts': ['low', 'medium', 'high', 'xhigh', 'max']},
