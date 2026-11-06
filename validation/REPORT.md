@@ -1,6 +1,29 @@
 # Model Switcher validation history and current native evidence
 
-The current 0.5.2 documentation correction reconciles the capability report with
+## 0.5.4 — CLI 0.166.0 readback diagnostics
+
+The full repository suite passed all 121 tests. Seven new CLI fixture tests exercise the
+sandbox and approved observations separately, genuine socket denial, silent EOF,
+incompatible responses, missing selection fields, and exact target verification.
+The release archive includes both these fixtures and the 0.5.3 handoff tests.
+
+| Read-only observation or fixture | 0.5.4 result |
+|---|---|
+| Sandbox CLI warns about PATH alias permissions, then socket connect reports ENOENT | `socket_not_found` |
+| Approved CLI reports the same missing configured socket path without the alias warning | `socket_not_found` |
+| Socket connection itself reports permission denied | `socket_permission_denied`, host approval indicated |
+| Proxy stdout ends before a reply, without a recognized socket diagnostic | `proxy_eof_before_reply` |
+| Unsupported HTTP upgrade, malformed WebSocket JSON, or incompatible RPC result | `incompatible_proxy_reply` |
+| Thread metadata omits reasoning effort | `incomplete_selection` |
+| Fresh valid reply followed by verification | Confirms only the intended chat, model and effort. Each independent mismatch blocks confirmation. |
+
+The original 0.166.0 host inspection and its approved read-only comparison both observed
+a missing socket path. The sandbox also produced the unrelated PATH warning. The patched
+helper reported the missing path at both access levels. Successful readback in this case
+was exercised with a protocol fixture. A failed inspect or verify leaves selection
+unknown, and configured selection alone cannot establish the model executing a turn.
+
+The 0.5.2 documentation correction reconciles the capability report with
 the authorized native 0.5.1 follow-up recorded below. Historical build/test outcomes
 remain scoped to their original revisions; they are not a current pending-approval
 gate. No runtime behavior or native permission changes in this correction.

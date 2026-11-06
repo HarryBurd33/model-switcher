@@ -16,6 +16,7 @@ SKILL_FILES = [
 PUBLIC_FILES = [
     'README.md', 'LICENSE', '.gitignore', '.github/workflows/ci.yml',
     'scripts/build_release.py', 'tests/test_install.py', 'tests/test_release.py', 'tests/test_active_chat.py', 'tests/test_continuation.py', 'tests/test_routing_policy.py',
+    'tests/test_model_switcher_handoff.py', 'tests/test_cli_0166_readback.py',
     'validation/REPORT.md', 'validation/cases.json', 'validation/evaluator.json',
     'validation/model-grades.md', 'validation/model-grades-v2.md',
     'validation/live-observations.json', 'validation/dependency-hashes.json',
@@ -100,7 +101,7 @@ def export(root, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=Path('dist/model-switcher-0.5.3.zip'))
+    parser.add_argument('--output', type=Path, default=Path('dist/model-switcher-0.5.4.zip'))
     parser.add_argument('--export-dir', type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]

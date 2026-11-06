@@ -122,8 +122,14 @@ historical scope; they do not certify the current transport on another host.
 
 A sandbox can deny the existing control socket even when the CLI and daemon work.
 The inspector returns `socket_permission_denied` with `requires_host_approval:true`
-when the bounded proxy diagnostic identifies that specific failure. A PATH-alias
-warning alone is not such evidence. Raw stderr and profile paths are not returned.
+when the bounded proxy diagnostic identifies that specific failure. A permission warning about PATH aliases can precede a separate socket error.
+Version 0.5.4 uses the cause following the socket connection diagnostic.
+A missing configured socket path produces `socket_not_found`. EOF without a
+recognized socket diagnostic produces `proxy_eof_before_reply`. An incompatible
+handshake or malformed metadata reply can produce `incompatible_proxy_reply`.
+A thread reply missing its model or effort produces `incomplete_selection`.
+An inspect or verify failure reports unknown selection. Confirmation requires
+fresh readback matching the intended chat, model and reasoning effort. Raw stderr and profile paths are not returned.
 When current authority covers the exact chat's read-only metadata, use the host's
 normal per-command approval boundary for that exact inspector command. This is
 separate from changing OS/file permissions. If approval is denied or unavailable,

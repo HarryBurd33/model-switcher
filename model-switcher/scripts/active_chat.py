@@ -32,16 +32,47 @@ class SocketPermissionError(GuardError):
     code = 'socket_permission_denied'
 
 
-def socket_permission_denied(stderr):
+class ProxyEOF(GuardError):
+    code = 'proxy_eof_before_reply'
+
+
+class ProxyWriteError(GuardError):
+    pass
+
+
+class SocketNotFound(GuardError):
+    code = 'socket_not_found'
+
+
+class IncompatibleReply(GuardError):
+    code = 'incompatible_proxy_reply'
+
+
+class IncompleteSelection(GuardError):
+    code = 'incomplete_selection'
+
+
+def socket_connect_error(stderr):
     text = stderr.decode('utf-8', errors='replace').lower()
-    return 'failed to connect to socket' in text and any(
-        word in text for word in ('operation not permitted', 'permission denied', 'access is denied'))
+    # Ignore unrelated CLI startup warnings preceding the connect failure.
+    _, marker, cause = text.partition('failed to connect to socket')
+    if marker:
+        if any(word in cause for word in ('operation not permitted', 'permission denied', 'access is denied')):
+            return SocketPermissionError(
+                "Host denied access to the existing Codex daemon socket. Use the host's "
+                "approved read-only command boundary when authorized; do not change socket "
+                "permissions, profiles, or start a server.")
+        if 'no such file or directory' in cause:
+            return SocketNotFound('Proxy could not find its configured socket path. Selection unknown.')
 
 
-
-def require(condition, message):
+def require(condition, message, error_type=GuardError):
     if not condition:
-        raise GuardError(message)
+        raise error_type(message)
+
+
+def require_reply(condition, message):
+    require(condition, message, IncompatibleReply)
 
 
 def token(value, label, maximum=128):
@@ -224,7 +255,7 @@ class ProxyChannel:
             raise GuardError('Existing-server metadata probe timed out')
         if isinstance(value, GuardError):
             raise value
-        require(value is not None, 'Existing-server proxy exited before reply; no fallback')
+        require(value is not None, 'Existing-server proxy exited before reply; no fallback', ProxyEOF)
         require(isinstance(value, bytes), 'Proxy must provide binary WebSocket data')
         self.buffer.extend(value)
 
@@ -238,6 +269,9 @@ class ProxyChannel:
 
     def read_headers(self):
         while True:
+            prefix = b'HTTP/1.1 '
+            require_reply(prefix.startswith(self.buffer) or self.buffer.startswith(prefix),
+                          'Proxy reply lacks the expected WebSocket HTTP upgrade status line')
             end = self.buffer.find(b'\r\n\r\n')
             if end >= 0:
                 require(end + 4 <= HEADER_LIMIT, 'WebSocket headers exceed bound')
@@ -269,7 +303,7 @@ class ProxyChannel:
             error = result.get(timeout=self.remaining())
         except queue.Empty:
             raise GuardError('Existing-server proxy write timed out')
-        require(error is None, 'Existing-server proxy write unavailable; no fallback')
+        require(error is None, 'Existing-server proxy write unavailable; no fallback', ProxyWriteError)
 
 
 def websocket_upgrade(channel):
@@ -281,21 +315,21 @@ def websocket_upgrade(channel):
     try:
         lines = channel.read_headers().decode('ascii').split('\r\n')
     except UnicodeError:
-        raise GuardError('Invalid WebSocket upgrade headers')
-    require(lines[0].split(' ', 2)[:2] == ['HTTP/1.1', '101'], 'Existing server refused WebSocket upgrade')
+        raise IncompatibleReply('Invalid WebSocket upgrade headers')
+    require_reply(lines[0].split(' ', 2)[:2] == ['HTTP/1.1', '101'], 'Existing server refused WebSocket upgrade')
     headers = {}
     for line in lines[1:]:
-        require(':' in line and not line.startswith((' ', '\t')), 'Malformed WebSocket header')
+        require_reply(':' in line and not line.startswith((' ', '\t')), 'Malformed WebSocket header')
         name, value = line.split(':', 1); name = name.lower()
-        require(re.fullmatch(r"[!#$%&'*+.^_`|~0-9a-z-]+", name) and name not in headers,
+        require_reply(re.fullmatch(r"[!#$%&'*+.^_`|~0-9a-z-]+", name) and name not in headers,
                 'Invalid or duplicate WebSocket header')
         headers[name] = value.strip()
     expected = base64.b64encode(hashlib.sha1((key + WS_GUID).encode('ascii')).digest()).decode('ascii')
-    require(headers.get('upgrade', '').lower() == 'websocket'
+    require_reply(headers.get('upgrade', '').lower() == 'websocket'
             and 'upgrade' in [x.strip().lower() for x in headers.get('connection', '').split(',')]
             and hmac.compare_digest(headers.get('sec-websocket-accept', ''), expected),
             'WebSocket upgrade validation failed')
-    require('sec-websocket-extensions' not in headers and 'sec-websocket-protocol' not in headers,
+    require_reply('sec-websocket-extensions' not in headers and 'sec-websocket-protocol' not in headers,
             'Unrequested WebSocket extension or subprotocol')
 
 
@@ -308,20 +342,20 @@ def websocket_send(channel, payload, opcode=1):
 
 def websocket_receive(channel):
     first, second = channel.read_exact(2)
-    require(first & 0x80 and not first & 0x70, 'Fragmented or extended WebSocket frames unsupported')
-    require(not second & 0x80, 'Server WebSocket frame must not be masked')
+    require_reply(first & 0x80 and not first & 0x70, 'Fragmented or extended WebSocket frames unsupported')
+    require_reply(not second & 0x80, 'Server WebSocket frame must not be masked')
     opcode, size = first & 0x0f, second & 0x7f
-    require(opcode in (1, 8, 9, 10), 'Unsupported WebSocket frame opcode')
+    require_reply(opcode in (1, 8, 9, 10), 'Unsupported WebSocket frame opcode')
     if size == 126:
         size = struct.unpack('!H', channel.read_exact(2))[0]
-        require(size >= 126, 'Noncanonical WebSocket length')
+        require_reply(size >= 126, 'Noncanonical WebSocket length')
     elif size == 127:
         size = struct.unpack('!Q', channel.read_exact(8))[0]
-        require(65536 <= size < 2**63, 'Noncanonical WebSocket length')
-    require(size <= FRAME_LIMIT and (opcode == 1 or size <= 125), 'WebSocket frame exceeds bound')
+        require_reply(65536 <= size < 2**63, 'Noncanonical WebSocket length')
+    require_reply(size <= FRAME_LIMIT and (opcode == 1 or size <= 125), 'WebSocket frame exceeds bound')
     payload = channel.read_exact(size)
     if opcode == 8:
-        raise GuardError('Existing-server WebSocket closed before reply')
+        raise ProxyEOF('Existing-server WebSocket closed before reply')
     if opcode == 9:
         websocket_send(channel, payload, opcode=10)
         return None
@@ -330,8 +364,8 @@ def websocket_receive(channel):
     try:
         value = json.loads(payload.decode('utf-8'))
     except (UnicodeError, ValueError):
-        raise GuardError('Invalid WebSocket metadata JSON')
-    require(isinstance(value, dict), 'Metadata message must be an object')
+        raise IncompatibleReply('Invalid WebSocket metadata JSON')
+    require_reply(isinstance(value, dict), 'Metadata message must be an object')
     return value
 
 
@@ -365,8 +399,9 @@ def inspect_selection(chat_id, executable='codex', timeout=20, include_catalog=F
                 continue
             require(not ('method' in value and 'id' in value), 'Unexpected server request')
             if value.get('id') == ident:
-                require('error' not in value and isinstance(value.get('result'), dict),
-                        'Existing-server metadata method unavailable')
+                require('error' not in value, 'Existing-server metadata method unavailable')
+                require_reply(isinstance(value.get('result'), dict),
+                              'Proxy returned an incompatible metadata result')
                 return value['result']
     try:
         channel = ProxyChannel(process, work_deadline)
@@ -375,8 +410,12 @@ def inspect_selection(chat_id, executable='codex', timeout=20, include_catalog=F
                                                'version': '0.3.1'}})
         send({'method': 'initialized', 'params': {}})
         data = request(2, 'thread/read', {'threadId': chat_id, 'includeTurns': False})
-        thread = object_field(data, 'thread')
+        thread = data.get('thread')
+        require_reply(isinstance(thread, dict), 'Proxy returned an incompatible thread result')
         require(thread.get('id') == chat_id, 'Probe returned another chat')
+        require(all(isinstance(thread.get(k), str) and thread[k].strip()
+                    for k in ('model', 'reasoningEffort')),
+                'Thread reply lacks a model or reasoning effort', IncompleteSelection)
         result = {'source': 'codex-app-server-thread-read',
                 'transport': 'existing-server-proxy-websocket', 'server_start_attempted': False,
                 'observed_at': dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -396,14 +435,12 @@ def inspect_selection(chat_id, executable='codex', timeout=20, include_catalog=F
             result['catalog'] = {'observed_at': dt.datetime.now(dt.timezone.utc).isoformat(),
                                  'source': 'existing-server-model-list', 'data': models}
         return result
-    except GuardError:
+    except (ProxyEOF, ProxyWriteError):
         if channel is not None:
             channel.stderr_done.wait(timeout=max(0, min(.1, deadline-time.monotonic())))
-            if socket_permission_denied(bytes(channel.stderr_prefix)):
-                raise SocketPermissionError(
-                    "Host denied access to the existing Codex daemon socket. Use the host's "
-                    "approved read-only command boundary when authorized; do not change socket "
-                    "permissions, profiles, or start a server.") from None
+            connect_error = socket_connect_error(bytes(channel.stderr_prefix))
+            if connect_error is not None:
+                raise connect_error from None
         raise
     finally:
         if channel is not None:
@@ -462,8 +499,13 @@ def main(argv=None):
         return 0
     except (GuardError, OSError, ValueError, TypeError, KeyError) as error:
         result = {'status': 'blocked', 'reason': str(error)}
+        if args.command in ('inspect', 'verify'):
+            result.update(selection_status='unknown', selection_confirmed=False,
+                          execution_confirmed=False, server_start_attempted=False)
+        if hasattr(error, 'code'):
+            result['code'] = error.code
         if isinstance(error, SocketPermissionError):
-            result.update(code=error.code, requires_host_approval=True, server_start_attempted=False)
+            result['requires_host_approval'] = True
         print(json.dumps(result), file=sys.stderr)
         return 2
 
