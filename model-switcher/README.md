@@ -1,4 +1,4 @@
-# Model Switcher 0.5.4
+# Model Switcher 0.5.5
 
 A user-level Codex policy for strong planning, economical qualified work and verified
 completion. Subscription allowance and API spending are separate resources. This is a

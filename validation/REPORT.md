@@ -1,5 +1,11 @@
 # Model Switcher validation history and current native evidence
 
+## 0.5.5 — current host capability correction
+
+The 2026-11-11 active-chat probe and approved read-only comparison both returned `socket_not_found` on CLI 0.166.0. A registered alternate readback tool returned an argument/tool-dispatch error rather than selection metadata. No supported alternate endpoint was established. Independent diagnosis ran seven readback and 30 continuation tests successfully and found no guard defect. The installed capability report now separates historical success from this current unavailable route and gives the existing manual fallback and exact host prerequisite. No native switch, schedule, service or model default was changed. Ordinary human-requested checkpoint resumption was verified separately.
+
+The package changes documentation and version labels only. Runtime selection, continuation, installer and routing code remain byte-identical to 0.5.4. The full repository regression suite passed all 121 tests and the 47-file release package built successfully. The release notes record final managed-install verification when published.
+
 ## 0.5.4 — CLI 0.166.0 readback diagnostics
 
 The full repository suite passed all 121 tests. Seven new CLI fixture tests exercise the

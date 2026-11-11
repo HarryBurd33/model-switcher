@@ -144,3 +144,7 @@ and use the same approved boundary for the receiver's metadata readback.
 
 Official boundaries: [permissions](https://learn.chatgpt.com/docs/permissions),
 [app-server protocol](https://learn.chatgpt.com/docs/app-server).
+
+## Missing endpoint prerequisite
+
+On a current `socket_not_found` result, `proxy --sock` is useful only when the host has supplied a documented existing endpoint for the same intended profile/chat. The option does not discover or create an endpoint. No known endpoint means the automatic route remains unavailable. Preserve a verified manual handoff and continue independent authorized work that does not require a differently modeled receiving turn. See the dated [capability report](capabilities.md); historical successful handoffs are not current capability evidence.

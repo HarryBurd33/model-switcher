@@ -27,6 +27,8 @@ chat, exactly-once external effects, or lower cost. Global instructions are inte
 profiles and host capabilities still apply. A selected-model CLI worker is a separate
 operation. [Capabilities and evidence](model-switcher/references/capabilities.md).
 
+Current host follow-up (2026-11-11, CLI 0.166.0): both sandbox and approved readback probes found no configured socket. Version 0.5.5 makes that limitation explicit in the installed capability report and retains manual resume. The guarded automatic route still requires live host readback; this documentation release does not repair a missing host service.
+
 ## Install globally for your user
 
 Requires Python 3.9+ and a Codex host that loads local skills and AGENTS instructions.
@@ -140,7 +142,7 @@ explicit spending boundary. Unknown telemetry and unmeasured savings remain unkn
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 scripts/build_release.py --output dist/model-switcher-0.5.4.zip
+python3 scripts/build_release.py --output dist/model-switcher-0.5.5.zip
 ```
 
 The build validates metadata, relative links, MIT notices and the explicit public file

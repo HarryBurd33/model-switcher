@@ -1,6 +1,6 @@
 # Capability report
 
-Build observations apply to this Mac and installed Codex CLI 0.164.0, not every host.
+Historical observations below apply to their recorded host and revision. Current-host availability must be checked separately; successful guard tests do not provide a missing endpoint.
 
 | Capability | Support / limitation |
 |---|---|
@@ -11,9 +11,9 @@ Build observations apply to this Mac and installed Codex CLI 0.164.0, not every 
 | Persistence | Global AGENTS source loaded in both unrelated native threads and delivered in the desktop chat; policy preserved in existing checkpoints; no service |
 | Lifecycle | Instruction calls at meaningful phases; existing task-checkpoint hooks remain independent |
 | External selected-model worker | Not bundled; historical dependency tests do not establish a current worker capability |
-| Native active-chat selection | Verified app-tool overrides plus host readback in the same active chat; subsequent turns only |
+| Native active-chat selection | Historically verified app-tool overrides plus host readback; conditional on a currently reachable supported endpoint; subsequent turns only |
 | Mid-turn inference | Not supported by this route; current turn can receive a configuration cue |
-| Automatic continuation | Observed authorized same-chat handoff: completed origin, distinct receiver, one claim and confirmed schedule deletion before work; at-most-once admission, not guaranteed delivery |
+| Automatic continuation | Historically observed completed origin, distinct receiver, one claim and schedule retirement; unavailable without current selection readback; at-most-once admission, not guaranteed delivery |
 | Automatic default and notices | `install/activate --automatic` saves profile-specific model/effort selection plus checkpoint-bound continuation preference; each actual change briefly names the target and reason; no setup schedule |
 | Desktop model/effort readback | Existing-daemon inspection confirms current configured or latest-persisted selection; per-turn executing-model identity is not exposed |
 | Model availability/efforts | Live `model/list`, account-specific; recheck before launch |
@@ -25,7 +25,17 @@ Build observations apply to this Mac and installed Codex CLI 0.164.0, not every 
 | Manual fallback | Filled checkpoint/model/effort/verification/resume instruction; receiving checks required |
 | Installation | Managed update/rollback/uninstall; verified existing uid/gid/modes and unchanged global activation bytes preserved |
 
-## Current native evidence
+## Current host check — 2026-11-11
+
+CLI 0.166.0 returned `socket_not_found` for the exact active chat in both the ordinary sandbox and the approved read-only probe. The alternate registered readback tool rejected its empty-argument call without selection metadata. Native messaging availability alone does not supply independent readback. No model selection or continuation schedule was attempted.
+
+The CLI's `proxy --sock` option accepts an explicitly known endpoint; it is not endpoint discovery or evidence that a compatible service is running. There was no trusted configured alternate endpoint in this task. Do not guess sockets, change profiles, start a service or alter defaults to fill this gap. The required host prerequisite is a supported, reachable read-only selection interface for the intended chat, or a documented existing-daemon endpoint supplied by the host.
+
+Until that prerequisite is present, use the [manual picker and verified resume procedure](host.md). Keep automatic continuation unarmed. A new human-authorized turn did resume the matching saved task after fresh quota, ownership and checkpoint verification; that demonstrates ordinary manual checkpoint resumption, not an automatic cross-model transition. The live automatic acceptance sequence remains unexecuted on this host state.
+
+Seven CLI readback tests and 30 continuation tests passed during the independent diagnosis. They include stale binding, duplicate admission and stop conditions, but are offline evidence. No guard defect was found, and 0.5.5 changes capability documentation and package version only.
+
+## Historical native evidence
 
 The authorized 0.5.1 follow-up on 2026-10-29 verified a real handoff in the same
 Codex desktop chat using installed task-checkpoint 0.8.3. Host readback confirmed
